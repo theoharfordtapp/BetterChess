@@ -109,8 +109,8 @@ function inCheck(boardState) {
         let king = isWhite ? 'K' : 'k';
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-                const piece = boardState[i][j];
-                if (piece === king) {
+                let pieceToCheck = boardState[i][j];
+                if (pieceToCheck === king) {
                     return { i, j };
                 }
             }
