@@ -377,7 +377,7 @@ function updateBoard() {
         const piece = initialBoard[row][col];
         if (piece !== ' ') {
             const img = document.createElement('img');
-            img.src = `https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${pieces[piece]}`;
+            img.src = `https://images.chesscomfiles.com/chess-themes/pieces/${theme}/150/${pieces[piece]}`;
             img.className = 'piece';
             square.appendChild(img);
         }
