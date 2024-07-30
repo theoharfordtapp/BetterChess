@@ -13,7 +13,7 @@ const pieces = {
     'P': 'wp.png'
 };
 
-const initialBoard = [
+let initialBoard = [
     'rnbqkbnr',
     'pppppppp',
     '        ',
@@ -27,6 +27,8 @@ const initialBoard = [
 let selectedPiece = null;
 let selectedOldSquare = null;
 let selectedSquare = null;
+
+let currentTurn = null;
 
 function createBoard() {
     const board = document.getElementById('chessboard');
@@ -71,12 +73,15 @@ function onSquareClick(event) {
     if (selectedOldSquare && selectedSquare) {
         movePiece();
         console.log(`Moved ${selectedPiece} from ${selectedOldSquare} to ${selectedSquare}`)
+        currentTurn = !(selectedPiece == selectedPiece.toLowerCase());
         selectedPiece = null;
         selectedOldSquare = null;
         selectedSquare = null;
     } else {
         console.log(`Selected ${selectedPiece}`)
     }
+
+    updateBoard();
 }
 
 function checkValidMove(piece, oldSquare, newSquare) {
@@ -182,18 +187,20 @@ function checkValidMove(piece, oldSquare, newSquare) {
 function select(square, row, col) {
     const piece = initialBoard[row][col];
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
-    if (selectedOldSquare !== null && selectedSquare == null) {
-        if (checkValidMove(selectedPiece, selectedOldSquare, square) == true) {
-            console.log(`Selecting square`);
-            selectedSquare = square;
-        } else {
-            selectedPiece = null;
-            selectedOldSquare = null;
+    if (currentMove == null || (piece == piece.toLowerCase()) == currentTurn) {
+        if (selectedOldSquare !== null && selectedSquare == null) {
+            if (checkValidMove(selectedPiece, selectedOldSquare, square) == true) {
+                console.log(`Selecting square`);
+                selectedSquare = square;
+            } else {
+                selectedPiece = null;
+                selectedOldSquare = null;
+            }
+        } else if (selectedOldSquare == null) {
+            console.log(`Selecting piece`);
+            selectedOldSquare = square;
+            selectedPiece = piece;
         }
-    } else if (selectedOldSquare == null) {
-        console.log(`Selecting piece`);
-        selectedOldSquare = square;
-        selectedPiece = piece;
     }
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
 }
@@ -227,6 +234,9 @@ function updateBoard() {
             img.src = `https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${pieces[piece]}`;
             img.className = 'piece';
             square.appendChild(img);
+        }
+        if (square == selectedOldSquare) {
+            square.classList.add('highlighted');
         }
     }
 }
