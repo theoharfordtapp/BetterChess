@@ -283,7 +283,7 @@ function select(square, row, col) {
 }
 
 function movePiece(boardToUpdate, piece, oldSquare, newSquare) {
-    const newBoard = boardToUpdate.map(row => row.split(''));
+    const newBoard = structuredClone(boardToUpdate);
     
     const oldRow = oldSquare.dataset.row;
     const oldCol = oldSquare.dataset.col;
