@@ -240,10 +240,13 @@ function updateBoard() {
         } else {
             square.classList.remove('highlighted');
         }
-        if (checkValidMove(selectedPiece, selectedOldSquare, square)) {
-            const dot = document.createElement('div');
-            dot.classList.add('dot');
-            square.appendChild(dot);
+
+        if (selectedPiece !== null && selectedOldSquare !== null) {
+            if (checkValidMove(selectedPiece, selectedOldSquare, square)) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                square.appendChild(dot);
+            }
         }
     }
 }
