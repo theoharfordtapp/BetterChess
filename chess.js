@@ -30,6 +30,7 @@ let selectedSquare = null;
 
 let currentTurn = null;
 let check = false;
+let checkmate = false;
 
 function createBoard() {
     const board = document.getElementById('chessboard');
@@ -86,6 +87,31 @@ function onSquareClick(event) {
     updateBoard();
 }
 
+function hasAnyMoves(boardState, square, piece) {
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            if (checkValidMove(boardState, false, piece, square, { dataset: { row: row, col: col } })) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+// Find the king's position for a given team
+function findKing(boardState, isWhite) {
+    let kingChar = 'K';
+    if (!isWhite) { kingChar = 'k'; }
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            if (boardState[row][col] === kingChar) {
+                return { row, col };
+            }
+        }
+    }
+    return null; // King not found (shouldn't happen in a valid game)
+}
+
 function inCheck(boardState) {
     // Helper function to determine if a position is under attack by any opponent piece
     function isUnderAttack(row, col, isWhite) {
@@ -102,23 +128,9 @@ function inCheck(boardState) {
         return false;
     }
 
-    // Find the king's position for a given team
-    function findKing(isWhite) {
-        let kingChar = 'K';
-        if (!isWhite) { kingChar = 'k'; }
-        for (let row = 0; row < 8; row++) {
-            for (let col = 0; col < 8; col++) {
-                if (boardState[row][col] === kingChar) {
-                    return { row, col };
-                }
-            }
-        }
-        return null; // King not found (shouldn't happen in a valid game)
-    }
-
     // Find both kings
-    const whiteKingPos = findKing(true);
-    const blackKingPos = findKing(false);
+    const whiteKingPos = findKing(boardState, true);
+    const blackKingPos = findKing(boardState, false);
 
     if (whiteKingPos === null || blackKingPos === null) {
         throw new Error("King not found on the board!");
@@ -190,8 +202,6 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
     if (!testingCheck) {
         throwawayBoard = structuredClone(boardState);
         hypothetical = movePiece(throwawayBoard, piece, oldSquare, newSquare);
-
-        console.log(newCol, newRow, isWhite, inCheck(hypothetical));
         
         if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
             return false;
@@ -308,11 +318,17 @@ function movePiece(boardToUpdate, piece, oldSquare, newSquare) {
 function updateBoard() {
     const board = document.getElementById('chessboard').children;
     if (inCheck(initialBoard)) {
-        check = true;
-        document.body.classList.add('check');
+        if ((!hasAnyMoves(initialBoard, findKing(initialBoard, true)) && inCheck(initialBoard) == 'white') || !hasAnyMoves(initialBoard, findKing(initialBoard, false)) && inCheck(initialBoard) == 'black') {
+            checkmate = true;
+            document.body.classList.add('checkmate');
+        } else {
+            check = true;
+            document.body.classList.add('check');
+        }
     } else {
         check = false;
         document.body.classList.remove('check');
+        document.body.classList.remove('checkmate');
     }
     for (let i = 0; i < board.length; i++) {
         const square = board[i];
