@@ -107,10 +107,10 @@ function inCheck(boardState) {
     function findKing(isWhite) {
         let kingChar = 'K';
         if (!isWhite) { kingChar = 'k'; }
-        for (let y = 0; y < 8; y++) {
-            for (let x = 0; x < 8; x++) {
-                if (boardState[y][x] === kingChar) {
-                    return { y, x };
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                if (boardState[row][col] === kingChar) {
+                    return { row, col };
                 }
             }
         }
