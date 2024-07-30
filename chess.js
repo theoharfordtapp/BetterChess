@@ -115,6 +115,7 @@ function movePiece() {
 
 function updateBoard() {
     const board = document.getElementById('chessboard').children;
+    console.log(initialBoard);
     for (let i = 0; i < board.length; i++) {
         const square = board[i];
         square.innerHTML = '';
