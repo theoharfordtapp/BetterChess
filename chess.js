@@ -107,6 +107,7 @@ function movePiece() {
     const oldCol = selectedOldSquare.dataset.col;
     const row = selectedSquare.dataset.row;
     const col = selectedSquare.dataset.col;
+    console.log(`Old: ${oldCol}x{oldRow} | New: ${col}x{row}`)
     initialBoard[oldRow][oldCol] = ' ';
     initialBoard[row][col] = selectedPiece;
     
