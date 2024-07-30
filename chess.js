@@ -72,7 +72,8 @@ function onSquareClick(event) {
     select(square, row, col);
     
     if (selectedOldSquare && selectedSquare) {
-        movePiece();
+        initialBoard = movePiece(initialBoard, selectedPiece, selectedOldSquare, selectedNewSquare);
+        updateBoard();
         console.log(`Moved ${selectedPiece} from ${selectedOldSquare} to ${selectedSquare}`)
         currentTurn = !(selectedPiece == selectedPiece.toLowerCase());
         selectedPiece = null;
@@ -86,12 +87,12 @@ function onSquareClick(event) {
 }
 
 function inCheck(boardState) {
-    // Helper function to determine if a position is under attack
-    function isUnderAttack(row, col) {
+    // Helper function to determine if a position is under attack by any opponent piece
+    function isUnderAttack(row, col, isWhite) {
         for (let r = 0; r < 8; r++) {
             for (let c = 0; c < 8; c++) {
                 const piece = boardState[r][c];
-                if (piece !== ' ' && (piece === piece.toUpperCase()) == currentTurn) {
+                if (piece !== ' ' && (piece === piece.toUpperCase()) !== isWhite) {
                     if (checkValidMove(piece, { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } })) {
                         return true;
                     }
@@ -101,9 +102,9 @@ function inCheck(boardState) {
         return false;
     }
 
-    // Find the king's position for the player
-    function findKing() {
-        const king = !currentTurn ? 'K' : 'k';
+    // Find the king's position for a given team
+    function findKing(isWhite) {
+        const king = isWhite ? 'K' : 'k';
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 if (boardState[row][col] === king) {
@@ -114,13 +115,27 @@ function inCheck(boardState) {
         return null; // King not found (shouldn't happen in a valid game)
     }
 
-    const kingPos = findKing();
-    if (kingPos === null) {
+    // Find both kings
+    const whiteKingPos = findKing(true);
+    const blackKingPos = findKing(false);
+
+    if (whiteKingPos === null || blackKingPos === null) {
         throw new Error("King not found on the board!");
     }
 
-    // Check if the king's position is under attack
-    return isUnderAttack(kingPos.row, kingPos.col);
+    // Check if either king's position is under attack
+    const whiteKingInCheck = isUnderAttack(whiteKingPos.row, whiteKingPos.col, true);
+    const blackKingInCheck = isUnderAttack(blackKingPos.row, blackKingPos.col, false);
+
+    if (whiteKingInCheck && blackKingInCheck) {
+        return 'both'; // Both kings are in check (shouldn't typically happen in a normal game)
+    } else if (whiteKingInCheck) {
+        return 'white';
+    } else if (blackKingInCheck) {
+        return 'black';
+    } else {
+        return false;
+    }
 }
 
 
@@ -131,7 +146,7 @@ function checkValidMove(piece, oldSquare, newSquare) {
     const newCol = parseInt(newSquare.dataset.col);
 
     const pieceType = piece.toLowerCase();
-    const isWhite = piece === piece.toUpperCase();
+    const isWhite = piece == piece.toUpperCase();
 
     // Helper function to check if the path is clear for rooks, bishops, and queens
     function isPathClear(startRow, startCol, endRow, endCol) {
@@ -164,6 +179,12 @@ function checkValidMove(piece, oldSquare, newSquare) {
 
     // If destination is occupied by the same colour, return false
     if (destinationPiece !== ' ' && isWhite === destinationIsWhite) {
+        return false;
+    }
+
+    hypothetical = movePiece(initialBoard, piece, oldSquare, newSquare);
+
+    if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
         return false;
     }
 
@@ -258,26 +279,31 @@ function select(square, row, col) {
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
 }
 
-function movePiece() {
-    const oldRow = selectedOldSquare.dataset.row;
-    const oldCol = selectedOldSquare.dataset.col;
-    const row = selectedSquare.dataset.row;
-    const col = selectedSquare.dataset.col;
+function movePiece(boardToUpdate, piece, oldSquare, newSquare) {
+    newBoard = boardToUpdate
+    
+    const oldRow = oldSquare.dataset.row;
+    const oldCol = oldSquare.dataset.col;
+    const row = square.dataset.row;
+    const col = square.dataset.col;
     console.log(`Old: ${oldCol}x${oldRow} | New: ${col}x${row}`)
     
-    initialBoard[oldRow] = initialBoard[oldRow].substring(0, oldCol) + ' ' + initialBoard[oldRow].substring(parseInt(oldCol) + 1);
-    initialBoard[row] = initialBoard[row].substring(0, col) + selectedPiece + initialBoard[row].substring(parseInt(col) + 1);
+    newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
+    newBoard[row] = newBoard[row].substring(0, col) + piece + newBoard[row].substring(parseInt(col) + 1);
 
-    console.log(initialBoard);
-    
-    updateBoard();
+    console.log(newBoard);
+
+    return newBoard;
 }
 
 function updateBoard() {
     const board = document.getElementById('chessboard').children;
     console.log(initialBoard);
     if (inCheck(initialBoard)) {
+        check = true;
         alert('check');
+    } else {
+        check = false;
     }
     for (let i = 0; i < board.length; i++) {
         const square = board[i];
