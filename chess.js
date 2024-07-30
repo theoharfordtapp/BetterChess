@@ -121,6 +121,8 @@ function inCheck(boardState) {
     const whiteKingPos = findKing(true);
     const blackKingPos = findKing(false);
 
+    console.log(whiteKingPos, blackKingPos);
+
     if (whiteKingPos === null || blackKingPos === null) {
         throw new Error("King not found on the board!");
     }
