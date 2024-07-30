@@ -237,6 +237,8 @@ function updateBoard() {
         }
         if (square == selectedOldSquare) {
             square.classList.add('highlighted');
+        } else {
+            square.classList.remove('highlighted');
         }
     }
 }
