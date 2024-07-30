@@ -67,9 +67,9 @@ function onSquareClick(event) {
 
     if (selectedPiece) {
         movePiece(row, col);
+        alert(`Moved ${selectedPiece} to ${selectedSquare}`)
         selectedPiece = null;
         selectedSquare = null;
-        alert(`Moved ${selectedPiece} to ${selectedSquare}`)
     } else {
         selectPiece(square, row, col);
         alert(`Selected ${selectedPiece}`)
@@ -80,6 +80,7 @@ function selectPiece(square, row, col) {
     const piece = initialBoard[row][col];
     if (piece !== ' ') {
         selectedPiece = piece;
+    } else {
         selectedSquare = square;
     }
 }
