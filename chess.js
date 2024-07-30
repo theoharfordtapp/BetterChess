@@ -270,8 +270,10 @@ function select(square, row, col) {
         } else {
             console.log('Invalid move, resetting');
             if (piece !== ' ') {
-                selectedPiece = piece;
-                selectedOldSquare = square;
+                if (currentTurn == null || (piece == piece.toLowerCase()) == currentTurn) {
+                    selectedPiece = piece;
+                    selectedOldSquare = square;
+                }
             } else {
                 selectedPiece = null;
                 selectedOldSquare = null;
