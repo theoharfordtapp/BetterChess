@@ -283,7 +283,7 @@ function select(square, row, col) {
 }
 
 function movePiece(boardToUpdate, piece, oldSquare, newSquare) {
-    newBoard = boardToUpdate
+    const newBoard = boardToUpdate.map(row => row.split(''));
     
     const oldRow = oldSquare.dataset.row;
     const oldCol = oldSquare.dataset.col;
