@@ -105,8 +105,8 @@ function inCheck(boardState) {
 
     // Find the king's position for a given team
     function findKing(isWhite) {
-        if (isWhite) { let kingChar = 'K'; }
-        else { let kingChar = 'k'; }
+        let kingChar = 'K';
+        if (!isWhite) { kingChar = 'k'; }
         for (let y = 0; y < 8; y++) {
             for (let x = 0; x < 8; x++) {
                 if (boardState[y][x] === kingChar) {
