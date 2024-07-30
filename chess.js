@@ -93,7 +93,7 @@ function select(square, row, col) {
         }
     } else if (selectedPiece == null) {
         console.log(`Selecting piece`);
-        selectedPiece == piece;
+        selectedPiece = piece;
     }
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare}`);
 }
