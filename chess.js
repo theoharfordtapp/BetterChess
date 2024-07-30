@@ -284,8 +284,8 @@ function movePiece(boardToUpdate, piece, oldSquare, newSquare) {
     
     const oldRow = oldSquare.dataset.row;
     const oldCol = oldSquare.dataset.col;
-    const row = square.dataset.row;
-    const col = square.dataset.col;
+    const row = newSquare.dataset.row;
+    const col = newSquare.dataset.col;
     console.log(`Old: ${oldCol}x${oldRow} | New: ${col}x${row}`)
     
     newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
