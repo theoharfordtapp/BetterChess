@@ -87,6 +87,7 @@ function onSquareClick(event) {
 }
 
 function inCheck(boardState) {
+    console.log(boardState)
     // Helper function to determine if a position is under attack by any opponent piece
     function isUnderAttack(row, col, isWhite) {
         for (let r = 0; r < 8; r++) {
@@ -107,6 +108,7 @@ function inCheck(boardState) {
         const king = isWhite ? 'K' : 'k';
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
+                console.log(boardState[row][col])
                 if (boardState[row][col] === king) {
                     return { row, col };
                 }
