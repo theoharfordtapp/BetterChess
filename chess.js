@@ -79,7 +79,7 @@ function onSquareClick(event) {
     }
 }
 
-function checkValidMove(piece, old, new) {
+function checkValidMove(piece, oldSquare, newSquare) {
     return true;
 }
 
