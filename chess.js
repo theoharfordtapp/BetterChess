@@ -109,7 +109,8 @@ function inCheck(boardState) {
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 console.log(boardState[row][col])
-                if (boardState[row][col] === king) {
+                console.log(king)
+                if (boardState[row][col] == king) {
                     return { row, col };
                 }
             }
