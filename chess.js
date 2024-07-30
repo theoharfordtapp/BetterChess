@@ -191,7 +191,7 @@ function checkValidMove(testingCheck, piece, oldSquare, newSquare) {
         throwawayBoard = structuredClone(initialBoard);
         hypothetical = movePiece(throwawayBoard, piece, oldSquare, newSquare);
 
-        console.log(isWhite, inCheck(hypothetical));
+        console.log(newCol, newRow, isWhite, inCheck(hypothetical));
         
         if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
             return false;
