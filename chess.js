@@ -87,14 +87,13 @@ function onSquareClick(event) {
 }
 
 function inCheck(boardState) {
-    console.log(boardState)
     // Helper function to determine if a position is under attack by any opponent piece
     function isUnderAttack(row, col, isWhite) {
         for (let r = 0; r < 8; r++) {
             for (let c = 0; c < 8; c++) {
                 const piece = boardState[r][c];
                 if (piece !== ' ' && (piece === piece.toUpperCase()) !== isWhite) {
-                    if (checkValidMove(piece, { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } })) {
+                    if (checkValidMove(true, piece, { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } })) {
                         return true;
                     }
                 }
@@ -105,13 +104,11 @@ function inCheck(boardState) {
 
     // Find the king's position for a given team
     function findKing(isWhite) {
+        console.log(boardState)
         const king = isWhite ? 'K' : 'k';
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
-                console.log(boardState[row][col])
-                console.log(king)
                 if (boardState[row][col] == king) {
-                    console.log('found king')
                     return { row, col };
                 }
             }
@@ -143,7 +140,7 @@ function inCheck(boardState) {
 }
 
 
-function checkValidMove(piece, oldSquare, newSquare) {
+function checkValidMove(ignoreCheck, piece, oldSquare, newSquare) {
     const oldRow = parseInt(oldSquare.dataset.row);
     const oldCol = parseInt(oldSquare.dataset.col);
     const newRow = parseInt(newSquare.dataset.row);
@@ -186,10 +183,12 @@ function checkValidMove(piece, oldSquare, newSquare) {
         return false;
     }
 
-    hypothetical = movePiece(initialBoard, piece, oldSquare, newSquare);
-
-    if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
-        return false;
+    if (!ignoreCheck) {
+        hypothetical = movePiece(initialBoard, piece, oldSquare, newSquare);
+    
+        if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
+            return false;
+        }
     }
 
     // Pawn moves
@@ -260,7 +259,7 @@ function select(square, row, col) {
     const piece = initialBoard[row][col];
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
     if (selectedOldSquare !== null && selectedSquare == null) {
-        if (checkValidMove(selectedPiece, selectedOldSquare, square) == true) {
+        if (checkValidMove(false, selectedPiece, selectedOldSquare, square) == true) {
             console.log(`Selecting square`);
             selectedSquare = square;
         } else {
@@ -328,7 +327,7 @@ function updateBoard() {
         }
 
         if (selectedPiece !== null && selectedOldSquare !== null) {
-            if (checkValidMove(selectedPiece, selectedOldSquare, square)) {
+            if (checkValidMove(false, selectedPiece, selectedOldSquare, square)) {
                 const dot = document.createElement('div');
                 dot.classList.add('dot');
                 square.appendChild(dot);
