@@ -240,6 +240,11 @@ function updateBoard() {
         } else {
             square.classList.remove('highlighted');
         }
+        if (checkValidMove(selectedPiece, selectedOldSquare, square)) {
+            const dot = document.createElement('div');
+            dot.style.borderRadius = '50%';
+            square.appendChild(dot);
+        }
     }
 }
 
