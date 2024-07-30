@@ -39,7 +39,7 @@ let gameOverNotified = false;
 
 let flipBoard = true;
 
-let theme = 'neo';
+let theme = 'classic';
 
 function createBoard() {
     const board = document.getElementById('chessboard');
