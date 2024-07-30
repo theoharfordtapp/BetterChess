@@ -108,8 +108,9 @@ function movePiece() {
     const row = selectedSquare.dataset.row;
     const col = selectedSquare.dataset.col;
     console.log(`Old: ${oldCol}x${oldRow} | New: ${col}x${row}`)
-    initialBoard[oldRow][oldCol] = ' ';
-    initialBoard[row][col] = selectedPiece;
+    
+    initialBoard[oldRow] = initialBoard[oldRow].substring(0, oldCol) + ' ' + initialBoard[oldRow].substring(parseInt(oldCol) + 1);
+    initialBoard[row] = initialBoard[row].substring(0, col) + selectedPiece + initialBoard[row].substring(parseInt(col) + 1);
 
     console.log(initialBoard);
     
