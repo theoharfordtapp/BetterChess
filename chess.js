@@ -370,7 +370,7 @@ function updateBoard() {
         let square = null;
         if (currentTurn == false) {
             square = board[i];
-        } else if (flipBoard) {
+        } else if (flipBoard == true) {
             square = board[63-i]
         }
         square.innerHTML = '';
