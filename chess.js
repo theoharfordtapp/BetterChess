@@ -183,6 +183,10 @@ function checkValidMove(ignoreCheck, piece, oldSquare, newSquare) {
         return false;
     }
 
+    if (initialBoard[newRow][newCol] == 'K' || initialBoard[newRow][newCol] == 'k') {
+        return false;
+    }
+    
     if (!ignoreCheck) {
         throwawayBoard = structuredClone(initialBoard);
         console.log(throwawayBoard);
