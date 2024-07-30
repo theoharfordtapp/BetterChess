@@ -186,7 +186,7 @@ function checkValidMove(testingCheck, piece, oldSquare, newSquare) {
         return false;
     }
 
-    if (testingCheck && (initialBoard[newRow][newCol] == 'K' || initialBoard[newRow][newCol] == 'k')) {
+    if (!testingCheck && (initialBoard[newRow][newCol] == 'K' || initialBoard[newRow][newCol] == 'k')) {
         return false;
     }
     
