@@ -111,6 +111,7 @@ function inCheck(boardState) {
                 console.log(boardState[row][col])
                 console.log(king)
                 if (boardState[row][col] == king) {
+                    console.log('found king')
                     return { row, col };
                 }
             }
