@@ -187,7 +187,7 @@ function checkValidMove(piece, oldSquare, newSquare) {
 function select(square, row, col) {
     const piece = initialBoard[row][col];
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
-    if (currentMove == null || (piece == piece.toLowerCase()) == currentTurn) {
+    if (currentTurn == null || (piece == piece.toLowerCase()) == currentTurn) {
         if (selectedOldSquare !== null && selectedSquare == null) {
             if (checkValidMove(selectedPiece, selectedOldSquare, square) == true) {
                 console.log(`Selecting square`);
