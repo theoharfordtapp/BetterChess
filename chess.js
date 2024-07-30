@@ -87,7 +87,7 @@ function onSquareClick(event) {
         const newRow = parseInt(selectedSquare.dataset.row);
         const newCol = parseInt(selectedSquare.dataset.col);
         
-        initialBoard = movePiece(initialBoard, selectedPiece, selectedOldSquare, selectedSquare);
+        initialBoard = movePiece(false, initialBoard, selectedPiece, selectedOldSquare, selectedSquare);
         updateBoard();
         
         // Reset en passant tracking
@@ -226,7 +226,7 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
     
     if (!testingCheck) {
         throwawayBoard = structuredClone(boardState);
-        hypothetical = movePiece(throwawayBoard, piece, oldSquare, newSquare);
+        hypothetical = movePiece(true, false, throwawayBoard, piece, oldSquare, newSquare);
         
         if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
             return false;
@@ -330,7 +330,7 @@ function select(square, row, col) {
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
 }
 
-function movePiece(boardToUpdate, piece, oldSquare, newSquare) {
+function movePiece(ignoreEnPassant, boardToUpdate, piece, oldSquare, newSquare) {
     const newBoard = structuredClone(boardToUpdate);
     console.log(newBoard)
     
@@ -340,7 +340,7 @@ function movePiece(boardToUpdate, piece, oldSquare, newSquare) {
     const col = newSquare.dataset.col;
     
     // Handle en passant capture
-    if (piece.toLowerCase() === 'p' && col !== oldCol && newBoard[row][col] === ' ') {
+    if (!ignoreEnPassant && piece.toLowerCase() === 'p' && col !== oldCol && newBoard[row][col] === ' ') {
         newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
         newBoard[oldRow] = newBoard[oldRow].substring(0, col) + ' ' + newBoard[oldRow].substring(parseInt(col) + 1); // Remove the captured pawn
     } else {
