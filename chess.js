@@ -93,7 +93,7 @@ function inCheck(boardState) {
             for (let c = 0; c < 8; c++) {
                 const piece = boardState[r][c];
                 if (piece !== ' ' && (piece === piece.toUpperCase()) !== isWhite) {
-                    if (checkValidMove(true, piece, { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } })) {
+                    if (checkValidMove(boardState, true, piece, { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } })) {
                         return true;
                     }
                 }
@@ -140,7 +140,7 @@ function inCheck(boardState) {
 }
 
 
-function checkValidMove(testingCheck, piece, oldSquare, newSquare) {
+function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
     const oldRow = parseInt(oldSquare.dataset.row);
     const oldCol = parseInt(oldSquare.dataset.col);
     const newRow = parseInt(newSquare.dataset.row);
@@ -160,7 +160,7 @@ function checkValidMove(testingCheck, piece, oldSquare, newSquare) {
         let col = startCol + stepCol;
 
         while (row !== endRow || col !== endCol) {
-            if (initialBoard[row][col] !== ' ') {
+            if (boardState[row][col] !== ' ') {
                 return false;
             }
             row += stepRow;
@@ -175,7 +175,7 @@ function checkValidMove(testingCheck, piece, oldSquare, newSquare) {
     }
 
     // Check if the destination square is occupied by the same colour
-    const destinationPiece = initialBoard[newRow][newCol];
+    const destinationPiece = boardState[newRow][newCol];
     const destinationIsWhite = destinationPiece === destinationPiece.toUpperCase();
 
     // If destination is occupied by the same colour, return false
@@ -183,12 +183,12 @@ function checkValidMove(testingCheck, piece, oldSquare, newSquare) {
         return false;
     }
 
-    if (!testingCheck && (initialBoard[newRow][newCol] == 'K' || initialBoard[newRow][newCol] == 'k')) {
+    if (!testingCheck && (boardState[newRow][newCol] == 'K' || boardState[newRow][newCol] == 'k')) {
         return false;
     }
     
     if (!testingCheck) {
-        throwawayBoard = structuredClone(initialBoard);
+        throwawayBoard = structuredClone(boardState);
         hypothetical = movePiece(throwawayBoard, piece, oldSquare, newSquare);
 
         console.log(newCol, newRow, isWhite, inCheck(hypothetical));
@@ -203,11 +203,11 @@ function checkValidMove(testingCheck, piece, oldSquare, newSquare) {
         const direction = isWhite ? -1 : 1;
         // Move one square forward
         if (newCol === oldCol) {
-            if (newRow === oldRow + direction && initialBoard[newRow][newCol] === ' ') {
+            if (newRow === oldRow + direction && boardState[newRow][newCol] === ' ') {
                 return true;
             }
             // Move two squares forward from the starting position
-            if (newRow === oldRow + 2 * direction && oldRow === (isWhite ? 6 : 1) && initialBoard[newRow][newCol] === ' ') {
+            if (newRow === oldRow + 2 * direction && oldRow === (isWhite ? 6 : 1) && boardState[newRow][newCol] === ' ') {
                 return true;
             }
         }
@@ -266,7 +266,7 @@ function select(square, row, col) {
     const piece = initialBoard[row][col];
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
     if (selectedOldSquare !== null && selectedSquare == null) {
-        if (checkValidMove(false, selectedPiece, selectedOldSquare, square) == true) {
+        if (checkValidMove(initialBoard, false, selectedPiece, selectedOldSquare, square) == true) {
             console.log(`Selecting square`);
             selectedSquare = square;
         } else {
@@ -333,7 +333,7 @@ function updateBoard() {
         }
 
         if (selectedPiece !== null && selectedOldSquare !== null) {
-            if (checkValidMove(false, selectedPiece, selectedOldSquare, square)) {
+            if (checkValidMove(initialBoard, false, selectedPiece, selectedOldSquare, square)) {
                 const dot = document.createElement('div');
                 dot.classList.add('dot');
                 square.appendChild(dot);
