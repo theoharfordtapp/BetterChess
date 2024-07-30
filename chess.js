@@ -318,7 +318,7 @@ function movePiece(boardToUpdate, piece, oldSquare, newSquare) {
 function updateBoard() {
     const board = document.getElementById('chessboard').children;
     if (inCheck(initialBoard)) {
-        if ((!hasAnyMoves(initialBoard, findKing(initialBoard, true)) && inCheck(initialBoard) == 'white') || !hasAnyMoves(initialBoard, findKing(initialBoard, false)) && inCheck(initialBoard) == 'black') {
+        if ((!hasAnyMoves(initialBoard, findKing(initialBoard, true), 'K') && inCheck(initialBoard) == 'white') || !hasAnyMoves(initialBoard, findKing(initialBoard, false), 'k') && inCheck(initialBoard) == 'black') {
             checkmate = true;
             document.body.classList.add('checkmate');
         } else {
