@@ -25,6 +25,7 @@ const initialBoard = [
 ];
 
 let selectedPiece = null;
+let selectedOldSquare = null;
 let selectedSquare = null;
 
 function createBoard() {
@@ -67,46 +68,49 @@ function onSquareClick(event) {
 
     select(square, row, col);
     
-    if (selectedPiece && selectedSquare) {
-        movePiece(row, col);
-        alert(`Moved ${selectedPiece} to ${selectedSquare}`)
+    if (selectedOldSquare && selectedSquare) {
+        movePiece();
+        console.log(`Moved ${selectedPiece} from ${selectedOldSquare} to ${selectedSquare}`)
         selectedPiece = null;
+        selectedOldSquare = null;
         selectedSquare = null;
     } else {
-        alert(`Selected ${selectedPiece}`)
+        console.log(`Selected ${selectedPiece}`)
     }
 }
 
-function checkValidMove(piece, square) {
+function checkValidMove(piece, old, new) {
     return true;
 }
 
 function select(square, row, col) {
     const piece = initialBoard[row][col];
-    console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare}`);
-    if (selectedPiece !== null && selectedSquare == null) {
-        if (checkValidMove(selectedPiece, selectedSquare) == true) {
+    console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
+    if (selectedOldSquare !== null && selectedSquare == null) {
+        if (checkValidMove(selectedPiece, selectedOldSquare, selectedSquare) == true) {
             console.log(`Selecting square`);
             selectedSquare = square;
         } else {
             selectedPiece = null;
+            selectedOldSquare = null;
         }
-    } else if (selectedPiece == null) {
+    } else if (selectedOldSquare == null) {
         console.log(`Selecting piece`);
+        selectedOldSquare = square;
         selectedPiece = piece;
     }
-    console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare}`);
+    console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
 }
 
-function movePiece(row, col) {
-    if (selectedPiece && selectedSquare) {
-        const oldRow = selectedSquare.dataset.row;
-        const oldCol = selectedSquare.dataset.col;
-        initialBoard[oldRow][oldCol] = ' ';
-        initialBoard[row][col] = selectedPiece;
-        
-        updateBoard();
-    }
+function movePiece() {
+    const oldRow = selectedOldSquare.dataset.row;
+    const oldCol = selectedOldSquare.dataset.col;
+    const row = selectedSquare.dataset.row;
+    const col = selectedSquare.dataset.col;
+    initialBoard[oldRow][oldCol] = ' ';
+    initialBoard[row][col] = selectedPiece;
+    
+    updateBoard();
 }
 
 function updateBoard() {
