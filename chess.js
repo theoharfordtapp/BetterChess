@@ -72,6 +72,8 @@ function onSquareClick(event) {
         alert(`Moved ${selectedPiece} to ${selectedSquare}`)
         selectedPiece = null;
         selectedSquare = null;
+    } else {
+        alert(`Selected ${selectedPiece}`)
     }
 }
 
@@ -81,6 +83,8 @@ function checkValidMove(piece, square) {
 
 function select(square, row, col) {
     const piece = initialBoard[row][col];
+    console.log(`Piece: ${piece} | Square: ${square}`);
+    console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare}`);
     if (selectedPiece !== null && selectedSquare == null) {
         if (checkValidMove(selectedPiece, selectedSquare) == true) {
             selectedSquare = square;
