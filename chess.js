@@ -389,8 +389,13 @@ function updateBoard() {
         }
     }
     if (checkmate) {
+        console.log(currentTurn);
         let winner = '';
-        if (currentTurn == false) { winner = 'White'; } else { winner = 'Black'; }
+        if (currentTurn == false) {
+            winner = 'White';
+        } else {
+            winner = 'Black';
+        }
         
         gameOverText = document.createElement('p');
         gameOverText.innerHTML = `${winner} wins!`;
