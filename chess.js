@@ -65,23 +65,30 @@ function onSquareClick(event) {
     const row = square.dataset.row;
     const col = square.dataset.col;
 
-    if (selectedPiece) {
+    select(square, row, col);
+    
+    if (selectedPiece && selectedSquare) {
         movePiece(row, col);
         alert(`Moved ${selectedPiece} to ${selectedSquare}`)
         selectedPiece = null;
         selectedSquare = null;
-    } else {
-        selectPiece(square, row, col);
-        alert(`Selected ${selectedPiece}`)
     }
 }
 
-function selectPiece(square, row, col) {
+function checkValidMove(piece, square) {
+    return true;
+}
+
+function select(square, row, col) {
     const piece = initialBoard[row][col];
-    if (piece !== ' ') {
-        selectedPiece = piece;
-    } else {
-        selectedSquare = square;
+    if (selectedPiece !== null && selectedSquare == null) {
+        if (checkValidMove(selectedPiece, selectedSquare) == true) {
+            selectedSquare = square;
+        } else {
+            selectedPiece = null;
+        }
+    } else if (selectedPiece == null) {
+        selectedPiece == piece;
     }
 }
 
