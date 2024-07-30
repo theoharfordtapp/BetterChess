@@ -312,7 +312,7 @@ function updateBoard() {
     console.log(initialBoard);
     if (inCheck(initialBoard)) {
         check = true;
-        alert('check');
+        document.body.classList.add('check');
     } else {
         check = false;
     }
