@@ -69,8 +69,10 @@ function onSquareClick(event) {
         movePiece(row, col);
         selectedPiece = null;
         selectedSquare = null;
+        alert(`Moved ${selectedPiece} to ${selectedSquare}`)
     } else {
         selectPiece(square, row, col);
+        alert(`Selected ${selectedPiece}`)
     }
 }
 
