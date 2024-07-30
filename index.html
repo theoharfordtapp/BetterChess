@@ -13,6 +13,9 @@
             background-color: #f0f0f0;
             transition: 0.6s;
             flex-direction: column;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         body.check {
             background-color: #ffefd6;
@@ -23,12 +26,17 @@
         p {
             font-size: 1.2em;
             font-family: Roboto, sans-serif;
+            margin: 1rem 0;
         }
         #chessboard {
             display: grid;
-            grid-template-columns: repeat(8, 80px);
-            grid-template-rows: repeat(8, 80px);
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
             gap: 0;
+            width: 90vmin;
+            height: 90vmin;
+            max-width: 100vw;
+            max-height: 100vh;
         }
         .dot {
             display: block;
@@ -39,14 +47,14 @@
             z-index: 1;
             border-radius: 50%;
             background-color: #44444466;
-            width: 28px;
-            height: 28px;
+            width: 20%;
+            height: 20%;
             margin: auto;
         }
         .square {
             position: relative;
-            width: 80px;
-            height: 80px;
+            width: 100%;
+            height: 100%;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -61,8 +69,8 @@
             background-color: #b58863;
         }
         .piece {
-            width: 80px;
-            height: 80px;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
