@@ -242,7 +242,7 @@ function updateBoard() {
         }
         if (checkValidMove(selectedPiece, selectedOldSquare, square)) {
             const dot = document.createElement('div');
-            dot.style.borderRadius = '50%';
+            dot.classList.add('dot');
             square.appendChild(dot);
         }
     }
