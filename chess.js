@@ -315,6 +315,7 @@ function updateBoard() {
         document.body.classList.add('check');
     } else {
         check = false;
+        document.body.classList.remove('check');
     }
     for (let i = 0; i < board.length; i++) {
         const square = board[i];
