@@ -194,8 +194,13 @@ function select(square, row, col) {
                 selectedSquare = square;
             } else {
                 console.log('Invalid move, resetting');
-                selectedPiece = null;
-                selectedOldSquare = null;
+                if (piece !== null) {
+                    selectedPiece = piece;
+                    selectedOldSquare = square;
+                } else {
+                    selectedPiece = null;
+                    selectedOldSquare = null;
+                }
             }
         } else if (selectedOldSquare == null) {
             console.log(`Selecting piece`);
