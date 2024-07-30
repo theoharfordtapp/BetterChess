@@ -73,6 +73,7 @@ function onSquareClick(event) {
     
     if (selectedOldSquare && selectedSquare) {
         initialBoard = movePiece(initialBoard, selectedPiece, selectedOldSquare, selectedNewSquare);
+        console.log('moved from onSquareClick');
         updateBoard();
         console.log(`Moved ${selectedPiece} from ${selectedOldSquare} to ${selectedSquare}`)
         currentTurn = !(selectedPiece == selectedPiece.toLowerCase());
@@ -185,6 +186,7 @@ function checkValidMove(ignoreCheck, piece, oldSquare, newSquare) {
 
     if (!ignoreCheck) {
         hypothetical = movePiece(initialBoard, piece, oldSquare, newSquare);
+        console.log('moved from checkValidMove');
     
         if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
             return false;
