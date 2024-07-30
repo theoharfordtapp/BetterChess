@@ -32,6 +32,9 @@ let currentTurn = null;
 let check = false;
 let checkmate = false;
 
+let lastMovedPawn = null;
+let enPassantTargetSquare = null;
+
 function createBoard() {
     const board = document.getElementById('chessboard');
     let isWhite = true;
@@ -73,15 +76,31 @@ function onSquareClick(event) {
     select(square, row, col);
     
     if (selectedOldSquare && selectedSquare) {
+        const oldRow = parseInt(selectedOldSquare.dataset.row);
+        const oldCol = parseInt(selectedOldSquare.dataset.col);
+        const newRow = parseInt(selectedSquare.dataset.row);
+        const newCol = parseInt(selectedSquare.dataset.col);
+        
         initialBoard = movePiece(initialBoard, selectedPiece, selectedOldSquare, selectedSquare);
         updateBoard();
-        console.log(`Moved ${selectedPiece} from ${selectedOldSquare} to ${selectedSquare}`)
+        
+        // Reset en passant tracking
+        lastMovedPawn = null;
+        enPassantTargetSquare = null;
+        
+        // Track potential en passant targets
+        if (selectedPiece.toLowerCase() === 'p' && Math.abs(newRow - oldRow) === 2) {
+            lastMovedPawn = selectedPiece;
+            enPassantTargetSquare = { dataset: { row: (oldRow + newRow) / 2, col: newCol } };
+        }
+        
+        console.log(`Moved ${selectedPiece} from ${selectedOldSquare} to ${selectedSquare}`);
         currentTurn = !(selectedPiece == selectedPiece.toLowerCase());
         selectedPiece = null;
         selectedOldSquare = null;
         selectedSquare = null;
     } else {
-        console.log(`Selected ${selectedPiece}`)
+        console.log(`Selected ${selectedPiece}`);
     }
 
     updateBoard();
@@ -217,13 +236,17 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
                 return true;
             }
             // Move two squares forward from the starting position
-            if (newRow === oldRow + 2 * direction && oldRow === (isWhite ? 6 : 1) && boardState[newRow][newCol] === ' ') {
+            if (newRow === oldRow + 2 * direction && oldRow === (isWhite ? 6 : 1) && boardState[newRow + direction][newCol] === ' ' && boardState[newRow][newCol] === ' ') {
                 return true;
             }
         }
         // Capture diagonally
         else if (Math.abs(newCol - oldCol) === 1 && newRow === oldRow + direction) {
             if (destinationPiece !== ' ') {
+                return true;
+            }
+            // En passant capture
+            if (enPassantTargetSquare && newRow === enPassantTargetSquare.dataset.row && newCol === enPassantTargetSquare.dataset.col) {
                 return true;
             }
         }
@@ -309,9 +332,16 @@ function movePiece(boardToUpdate, piece, oldSquare, newSquare) {
     const row = newSquare.dataset.row;
     const col = newSquare.dataset.col;
     
-    newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
+    // Handle en passant capture
+    if (piece.toLowerCase() === 'p' && col !== oldCol && newBoard[row][col] === ' ') {
+        newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
+        newBoard[oldRow] = newBoard[oldRow].substring(0, col) + ' ' + newBoard[oldRow].substring(parseInt(col) + 1); // Remove the captured pawn
+    } else {
+        newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
+    }
+    
     newBoard[row] = newBoard[row].substring(0, col) + piece + newBoard[row].substring(parseInt(col) + 1);
-
+    
     return newBoard;
 }
 
