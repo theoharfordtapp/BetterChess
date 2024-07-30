@@ -37,6 +37,8 @@ let enPassantTargetSquare = null;
 
 let gameOverNotified = false;
 
+let flipBoard = true;
+
 function createBoard() {
     const board = document.getElementById('chessboard');
     let isWhite = true;
@@ -365,10 +367,10 @@ function updateBoard() {
         document.body.classList.remove('checkmate');
     }
     for (let i = 0; i < board.length; i++) {
-        const square = null;
+        let square = null;
         if (currentTurn == false) {
             square = board[i];
-        } else {
+        } else if (flipBoard) {
             square = board[63-i]
         }
         square.innerHTML = '';
