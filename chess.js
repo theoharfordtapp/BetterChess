@@ -72,7 +72,7 @@ function onSquareClick(event) {
     select(square, row, col);
     
     if (selectedOldSquare && selectedSquare) {
-        initialBoard = movePiece(initialBoard, selectedPiece, selectedOldSquare, selectedNewSquare);
+        initialBoard = movePiece(initialBoard, selectedPiece, selectedOldSquare, selectedSquare);
         console.log('moved from onSquareClick');
         updateBoard();
         console.log(`Moved ${selectedPiece} from ${selectedOldSquare} to ${selectedSquare}`)
