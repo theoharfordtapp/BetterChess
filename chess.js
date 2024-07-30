@@ -29,6 +29,7 @@ let selectedOldSquare = null;
 let selectedSquare = null;
 
 let currentTurn = null;
+let check = false;
 
 function createBoard() {
     const board = document.getElementById('chessboard');
@@ -83,6 +84,45 @@ function onSquareClick(event) {
 
     updateBoard();
 }
+
+function inCheck(boardState) {
+    // Helper function to determine if a position is under attack
+    function isUnderAttack(row, col) {
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                const piece = boardState[r][c];
+                if (piece !== ' ' && (piece === piece.toUpperCase()) == currentTurn) {
+                    if (checkValidMove(piece, { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } })) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    // Find the king's position for the player
+    function findKing() {
+        const king = !currentTurn ? 'K' : 'k';
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                if (boardState[row][col] === king) {
+                    return { row, col };
+                }
+            }
+        }
+        return null; // King not found (shouldn't happen in a valid game)
+    }
+
+    const kingPos = findKing();
+    if (kingPos === null) {
+        throw new Error("King not found on the board!");
+    }
+
+    // Check if the king's position is under attack
+    return isUnderAttack(kingPos.row, kingPos.col);
+}
+
 
 function checkValidMove(piece, oldSquare, newSquare) {
     const oldRow = parseInt(oldSquare.dataset.row);
@@ -236,6 +276,9 @@ function movePiece() {
 function updateBoard() {
     const board = document.getElementById('chessboard').children;
     console.log(initialBoard);
+    if (inCheck(initialBoard)) {
+        alert('check');
+    }
     for (let i = 0; i < board.length; i++) {
         const square = board[i];
         square.innerHTML = '';
