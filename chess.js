@@ -93,6 +93,7 @@ function inCheck(boardState) {
             for (let c = 0; c < 8; c++) {
                 const piece = boardState[r][c];
                 if (piece !== ' ' && (piece === piece.toUpperCase()) !== isWhite) {
+                    console.log(`Testing if piece ${piece} is checking ${'white' ? isWhite : 'white'} king`);
                     if (checkValidMove(true, piece, { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } })) {
                         return true;
                     }
@@ -119,6 +120,8 @@ function inCheck(boardState) {
     // Find both kings
     const whiteKingPos = findKing(true);
     const blackKingPos = findKing(false);
+
+    console.log(whiteKingPos, blackKingPos);
 
     if (whiteKingPos === null || blackKingPos === null) {
         throw new Error("King not found on the board!");
