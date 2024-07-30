@@ -183,7 +183,7 @@ function select(square, row, col) {
     const piece = initialBoard[row][col];
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
     if (selectedOldSquare !== null && selectedSquare == null) {
-        if (checkValidMove(selectedPiece, selectedOldSquare, selectedSquare) == true) {
+        if (checkValidMove(selectedPiece, selectedOldSquare, square) == true) {
             console.log(`Selecting square`);
             selectedSquare = square;
         } else {
