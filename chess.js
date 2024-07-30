@@ -120,21 +120,28 @@ function checkValidMove(piece, oldSquare, newSquare) {
 
     // Check if the destination square is occupied by the same colour
     const destinationPiece = initialBoard[newRow][newCol];
-    if (destinationPiece !== ' ' && (isWhite === (destinationPiece === destinationPiece.toUpperCase()))) {
+    const destinationIsWhite = destinationPiece === destinationPiece.toUpperCase();
+
+    // If destination is occupied by the same colour, return false
+    if (destinationPiece !== ' ' && isWhite === destinationIsWhite) {
         return false;
     }
 
     // Pawn moves
     if (pieceType === 'p') {
         const direction = isWhite ? -1 : 1;
+        // Move one square forward
         if (newCol === oldCol) {
             if (newRow === oldRow + direction && initialBoard[newRow][newCol] === ' ') {
                 return true;
             }
+            // Move two squares forward from the starting position
             if (newRow === oldRow + 2 * direction && oldRow === (isWhite ? 6 : 1) && initialBoard[newRow][newCol] === ' ') {
                 return true;
             }
-        } else if (Math.abs(newCol - oldCol) === 1 && newRow === oldRow + direction) {
+        }
+        // Capture diagonally
+        else if (Math.abs(newCol - oldCol) === 1 && newRow === oldRow + direction) {
             if (destinationPiece !== ' ') {
                 return true;
             }
