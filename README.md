@@ -1,2 +1,2 @@
 # BetterChess
-Chess but better
+[Play here](https://theoharfordtapp.github.io/BetterChess/)
