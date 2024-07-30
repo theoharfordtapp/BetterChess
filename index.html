@@ -18,10 +18,20 @@
             grid-template-rows: repeat(8, 80px);
             gap: 0;
         }
+        .dot {
+            display: block;
+            border-radius: 50%;
+            background-color: #66666666;
+            width: 30px;
+            height: 30px;
+            margin: auto;
+        }
         .square {
             width: 80px;
             height: 80px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
         }
         .square.highlighted {
             background-color: #fff08f !important;
