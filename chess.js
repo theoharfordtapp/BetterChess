@@ -93,7 +93,6 @@ function inCheck(boardState) {
             for (let c = 0; c < 8; c++) {
                 const piece = boardState[r][c];
                 if (piece !== ' ' && (piece === piece.toUpperCase()) !== isWhite) {
-                    console.log(`Testing if piece ${piece} is checking ${'white' ? isWhite : 'white'} king`);
                     if (checkValidMove(true, piece, { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } })) {
                         return true;
                     }
