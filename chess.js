@@ -226,7 +226,7 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
     
     if (!testingCheck) {
         throwawayBoard = structuredClone(boardState);
-        hypothetical = movePiece(true, false, throwawayBoard, piece, oldSquare, newSquare);
+        hypothetical = movePiece(true, throwawayBoard, piece, oldSquare, newSquare);
         
         if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
             return false;
