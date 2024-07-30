@@ -189,15 +189,15 @@ function checkValidMove(ignoreCheck, piece, oldSquare, newSquare) {
         return false;
     }
 
-    // if (!ignoreCheck) {
-    //     throwawayBoard = structuredClone(initialBoard);
-    //     hypothetical = movePiece(throwawayBoard, piece, oldSquare, newSquare);
-    //     console.log('moved from checkValidMove');
+    if (!ignoreCheck) {
+        throwawayBoard = structuredClone(initialBoard);
+        hypothetical = movePiece(throwawayBoard, piece, oldSquare, newSquare);
+        console.log('moved from checkValidMove');
     
-    //     if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
-    //         return false;
-    //     }
-    // }
+        if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
+            return false;
+        }
+    }
 
     // Pawn moves
     if (pieceType === 'p') {
