@@ -143,7 +143,7 @@ function inCheck(boardState) {
 }
 
 
-function checkValidMove(ignoreCheck, piece, oldSquare, newSquare) {
+function checkValidMove(testingCheck, piece, oldSquare, newSquare) {
     const oldRow = parseInt(oldSquare.dataset.row);
     const oldCol = parseInt(oldSquare.dataset.col);
     const newRow = parseInt(newSquare.dataset.row);
@@ -186,11 +186,11 @@ function checkValidMove(ignoreCheck, piece, oldSquare, newSquare) {
         return false;
     }
 
-    if (initialBoard[newRow][newCol] == 'K' || initialBoard[newRow][newCol] == 'k') {
+    if (testingCheck && (initialBoard[newRow][newCol] == 'K' || initialBoard[newRow][newCol] == 'k')) {
         return false;
     }
     
-    if (!ignoreCheck) {
+    if (!testingCheck) {
         throwawayBoard = structuredClone(initialBoard);
         console.log(throwawayBoard);
         hypothetical = movePiece(throwawayBoard, piece, oldSquare, newSquare);
