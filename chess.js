@@ -147,7 +147,7 @@ function checkValidMove(testingCheck, piece, oldSquare, newSquare) {
     const newCol = parseInt(newSquare.dataset.col);
 
     const pieceType = piece.toLowerCase();
-    const isWhite = piece == piece.toUpperCase();
+    const isWhite = (piece == piece.toUpperCase());
 
     // Helper function to check if the path is clear for rooks, bishops, and queens
     function isPathClear(startRow, startCol, endRow, endCol) {
@@ -190,7 +190,9 @@ function checkValidMove(testingCheck, piece, oldSquare, newSquare) {
     if (!testingCheck) {
         throwawayBoard = structuredClone(initialBoard);
         hypothetical = movePiece(throwawayBoard, piece, oldSquare, newSquare);
-    
+
+        console.log(isWhite, inCheck(hypothetical));
+        
         if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
             return false;
         }
