@@ -24,6 +24,9 @@ const initialBoard = [
     'RNBQKBNR'
 ];
 
+let selectedPiece = null;
+let selectedSquare = null;
+
 function createBoard() {
     const board = document.getElementById('chessboard');
     let isWhite = true;
@@ -32,6 +35,9 @@ function createBoard() {
         for (let col = 0; col < 8; col++) {
             const square = document.createElement('div');
             square.className = `square ${isWhite ? 'white' : 'black'}`;
+            square.dataset.row = row;
+            square.dataset.col = col;
+            square.addEventListener('click', onSquareClick);
             isWhite = !isWhite;
             if (col === 7) isWhite = !isWhite;
             board.appendChild(square);
@@ -50,6 +56,56 @@ function placePieces() {
                 img.className = 'piece';
                 board[row * 8 + col].appendChild(img);
             }
+        }
+    }
+}
+
+function onSquareClick(event) {
+    const square = event.currentTarget;
+    const row = square.dataset.row;
+    const col = square.dataset.col;
+
+    if (selectedPiece) {
+        movePiece(row, col);
+        selectedPiece = null;
+        selectedSquare = null;
+    } else {
+        selectPiece(square, row, col);
+    }
+}
+
+function selectPiece(square, row, col) {
+    const piece = initialBoard[row][col];
+    if (piece !== ' ') {
+        selectedPiece = piece;
+        selectedSquare = square;
+    }
+}
+
+function movePiece(row, col) {
+    if (selectedPiece && selectedSquare) {
+        const oldRow = selectedSquare.dataset.row;
+        const oldCol = selectedSquare.dataset.col;
+        initialBoard[oldRow][oldCol] = ' ';
+        initialBoard[row][col] = selectedPiece;
+        
+        updateBoard();
+    }
+}
+
+function updateBoard() {
+    const board = document.getElementById('chessboard').children;
+    for (let i = 0; i < board.length; i++) {
+        const square = board[i];
+        square.innerHTML = '';
+        const row = square.dataset.row;
+        const col = square.dataset.col;
+        const piece = initialBoard[row][col];
+        if (piece !== ' ') {
+            const img = document.createElement('img');
+            img.src = `https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${pieces[piece]}`;
+            img.className = 'piece';
+            square.appendChild(img);
         }
     }
 }
