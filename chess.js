@@ -389,12 +389,11 @@ function updateBoard() {
         }
     }
     if (checkmate) {
-        console.log(currentTurn);
         let winner = '';
-        if (currentTurn == false) {
-            winner = 'White';
-        } else {
+        if (inCheck(initialBoard) == 'white') {
             winner = 'Black';
+        } else {
+            winner = 'White';
         }
         
         gameOverText = document.createElement('p');
