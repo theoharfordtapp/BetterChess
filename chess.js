@@ -367,12 +367,7 @@ function updateBoard() {
         document.body.classList.remove('checkmate');
     }
     for (let i = 0; i < board.length; i++) {
-        let square = null;
-        if (currentTurn == false) {
-            square = board[i];
-        } else if (flipBoard == true) {
-            square = board[63-i]
-        }
+        const square = board[i];
         square.innerHTML = '';
         const row = square.dataset.row;
         const col = square.dataset.col;
