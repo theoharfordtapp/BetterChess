@@ -69,6 +69,8 @@ function placePieces() {
 }
 
 function onSquareClick(event) {
+    if (checkmate) { return null; }
+    
     const square = event.currentTarget;
     const row = square.dataset.row;
     const col = square.dataset.col;
@@ -385,6 +387,15 @@ function updateBoard() {
                 square.appendChild(dot);
             }
         }
+    }
+    if (checkmate) {
+        let winner = '';
+        if (currentTurn == false) { winner = 'White'; } else { winner = 'Black'; }
+        
+        gameOverText = document.createElement('p');
+        gameOverText.innerHTML = `${winner} wins!`;
+        
+        document.body.appendChild(gameOverText);
     }
 }
 
