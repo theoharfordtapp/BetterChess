@@ -1,0 +1,2 @@
+# BetterChess
+Chess but better
