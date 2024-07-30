@@ -105,12 +105,13 @@ function inCheck(boardState) {
 
     // Find the king's position for a given team
     function findKing(isWhite) {
-        console.log(boardState)
-        const king = isWhite ? 'K' : 'k';
-        for (let row = 0; row < 8; row++) {
-            for (let col = 0; col < 8; col++) {
-                if (boardState[row][col] == king) {
-                    return { row, col };
+        console.log(boardState);
+        let king = isWhite ? 'K' : 'k';
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                const piece = boardState[i][j]
+                if piece === king) {
+                    return { i, j };
                 }
             }
         }
