@@ -73,7 +73,6 @@ function onSquareClick(event) {
     
     if (selectedOldSquare && selectedSquare) {
         initialBoard = movePiece(initialBoard, selectedPiece, selectedOldSquare, selectedSquare);
-        console.log('moved from onSquareClick');
         updateBoard();
         console.log(`Moved ${selectedPiece} from ${selectedOldSquare} to ${selectedSquare}`)
         currentTurn = !(selectedPiece == selectedPiece.toLowerCase());
@@ -121,8 +120,6 @@ function inCheck(boardState) {
     const whiteKingPos = findKing(true);
     const blackKingPos = findKing(false);
 
-    console.log(whiteKingPos, blackKingPos);
-
     if (whiteKingPos === null || blackKingPos === null) {
         throw new Error("King not found on the board!");
     }
@@ -144,7 +141,6 @@ function inCheck(boardState) {
 
 
 function checkValidMove(ignoreCheck, piece, oldSquare, newSquare) {
-    console.log(oldSquare, newSquare);
     const oldRow = parseInt(oldSquare.dataset.row);
     const oldCol = parseInt(oldSquare.dataset.col);
     const newRow = parseInt(newSquare.dataset.row);
@@ -179,8 +175,6 @@ function checkValidMove(ignoreCheck, piece, oldSquare, newSquare) {
     }
 
     // Check if the destination square is occupied by the same colour
-    console.log(initialBoard);
-    console.log(newRow, newCol);
     const destinationPiece = initialBoard[newRow][newCol];
     const destinationIsWhite = destinationPiece === destinationPiece.toUpperCase();
 
@@ -194,7 +188,6 @@ function checkValidMove(ignoreCheck, piece, oldSquare, newSquare) {
         console.log(throwawayBoard);
         hypothetical = movePiece(throwawayBoard, piece, oldSquare, newSquare);
         console.log(hypothetical);
-        console.log('moved from checkValidMove');
     
         if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
             return false;
@@ -304,14 +297,11 @@ function movePiece(boardToUpdate, piece, oldSquare, newSquare) {
     newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
     newBoard[row] = newBoard[row].substring(0, col) + piece + newBoard[row].substring(parseInt(col) + 1);
 
-    console.log(newBoard);
-
     return newBoard;
 }
 
 function updateBoard() {
     const board = document.getElementById('chessboard').children;
-    console.log(initialBoard);
     if (inCheck(initialBoard)) {
         check = true;
         document.body.classList.add('check');
