@@ -194,22 +194,22 @@ function checkValidMove(piece, oldSquare, newSquare) {
 function select(square, row, col) {
     const piece = initialBoard[row][col];
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
-    if (currentTurn == null || (piece == piece.toLowerCase()) == currentTurn || piece == ' ') {
-        if (selectedOldSquare !== null && selectedSquare == null) {
-            if (checkValidMove(selectedPiece, selectedOldSquare, square) == true) {
-                console.log(`Selecting square`);
-                selectedSquare = square;
+    if (selectedOldSquare !== null && selectedSquare == null) {
+        if (checkValidMove(selectedPiece, selectedOldSquare, square) == true) {
+            console.log(`Selecting square`);
+            selectedSquare = square;
+        } else {
+            console.log('Invalid move, resetting');
+            if (piece !== ' ') {
+                selectedPiece = piece;
+                selectedOldSquare = square;
             } else {
-                console.log('Invalid move, resetting');
-                if (piece !== ' ') {
-                    selectedPiece = piece;
-                    selectedOldSquare = square;
-                } else {
-                    selectedPiece = null;
-                    selectedOldSquare = null;
-                }
+                selectedPiece = null;
+                selectedOldSquare = null;
             }
-        } else if (selectedOldSquare == null && piece !== ' ') {
+        }
+    } else if (selectedOldSquare == null && piece !== ' ') {
+        if (currentTurn == null || (piece == piece.toLowerCase()) == currentTurn) {
             console.log(`Selecting piece`);
             selectedOldSquare = square;
             selectedPiece = piece;
