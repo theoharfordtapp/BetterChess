@@ -142,6 +142,7 @@ function inCheck(boardState) {
 
 
 function checkValidMove(ignoreCheck, piece, oldSquare, newSquare) {
+    console.log(oldSquare, newSquare);
     const oldRow = parseInt(oldSquare.dataset.row);
     const oldCol = parseInt(oldSquare.dataset.col);
     const newRow = parseInt(newSquare.dataset.row);
