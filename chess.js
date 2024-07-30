@@ -105,7 +105,7 @@ function findKing(boardState, isWhite) {
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
             if (boardState[row][col] === kingChar) {
-                return { row, col };
+                return { dataset: { row: row, col: col } };
             }
         }
     }
@@ -137,8 +137,8 @@ function inCheck(boardState) {
     }
 
     // Check if either king's position is under attack
-    const whiteKingInCheck = isUnderAttack(whiteKingPos.row, whiteKingPos.col, true);
-    const blackKingInCheck = isUnderAttack(blackKingPos.row, blackKingPos.col, false);
+    const whiteKingInCheck = isUnderAttack(whiteKingPos.dataset.row, whiteKingPos.dataset.col, true);
+    const blackKingInCheck = isUnderAttack(blackKingPos.dataset.row, blackKingPos.dataset.col, false);
 
     if (whiteKingInCheck && blackKingInCheck) {
         return 'both'; // Both kings are in check (shouldn't typically happen in a normal game)
