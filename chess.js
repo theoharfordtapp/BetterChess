@@ -176,6 +176,8 @@ function checkValidMove(ignoreCheck, piece, oldSquare, newSquare) {
     }
 
     // Check if the destination square is occupied by the same colour
+    console.log(initialBoard);
+    console.log(newRow, newCol);
     const destinationPiece = initialBoard[newRow][newCol];
     const destinationIsWhite = destinationPiece === destinationPiece.toUpperCase();
 
