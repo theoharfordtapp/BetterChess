@@ -332,6 +332,7 @@ function select(square, row, col) {
 
 function movePiece(boardToUpdate, piece, oldSquare, newSquare) {
     const newBoard = structuredClone(boardToUpdate);
+    console.log(newBoard)
     
     const oldRow = oldSquare.dataset.row;
     const oldCol = oldSquare.dataset.col;
@@ -385,7 +386,6 @@ function updateBoard() {
         }
 
         if (selectedPiece !== null && selectedOldSquare !== null) {
-            console.log(movePiece(initialBoard, selectedPiece, selectedOldSquare, square))
             if (checkValidMove(initialBoard, false, selectedPiece, selectedOldSquare, square)) {
                 const dot = document.createElement('div');
                 dot.classList.add('dot');
