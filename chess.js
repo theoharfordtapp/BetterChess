@@ -83,8 +83,6 @@ function checkValidMove(piece, square) {
 
 function select(square, row, col) {
     const piece = initialBoard[row][col];
-    console.log(`Piece: ${piece} | Square: ${square}`);
-    console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare}`);
     if (selectedPiece !== null && selectedSquare == null) {
         if (checkValidMove(selectedPiece, selectedSquare) == true) {
             selectedSquare = square;
@@ -94,6 +92,8 @@ function select(square, row, col) {
     } else if (selectedPiece == null) {
         selectedPiece == piece;
     }
+    console.log(`Piece: ${piece} | Square: ${square}`);
+    console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare}`);
 }
 
 function movePiece(row, col) {
