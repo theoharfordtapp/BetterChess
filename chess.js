@@ -35,6 +35,8 @@ let checkmate = false;
 let lastMovedPawn = null;
 let enPassantTargetSquare = null;
 
+let gameOverNotified = false;
+
 function createBoard() {
     const board = document.getElementById('chessboard');
     let isWhite = true;
@@ -363,7 +365,12 @@ function updateBoard() {
         document.body.classList.remove('checkmate');
     }
     for (let i = 0; i < board.length; i++) {
-        const square = board[i];
+        const square = null;
+        if (currentTurn == false) {
+            square = board[i];
+        } else {
+            square = board[63-i]
+        }
         square.innerHTML = '';
         const row = square.dataset.row;
         const col = square.dataset.col;
@@ -388,7 +395,7 @@ function updateBoard() {
             }
         }
     }
-    if (checkmate) {
+    if (checkmate && !gameOverNotified) {
         let winner = '';
         if (inCheck(initialBoard) == 'white') {
             winner = 'Black';
@@ -400,6 +407,8 @@ function updateBoard() {
         gameOverText.innerHTML = `${winner} wins!`;
         
         document.body.appendChild(gameOverText);
+
+        gameOverNotified = true;
     }
 }
 
