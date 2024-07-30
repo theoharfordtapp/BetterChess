@@ -20,13 +20,19 @@
         }
         .dot {
             display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
             border-radius: 50%;
-            background-color: #66666644;
-            width: 26px;
-            height: 26px;
+            background-color: #44444488;
+            width: 28px;
+            height: 28px;
             margin: auto;
         }
         .square {
+            position: relative;
             width: 80px;
             height: 80px;
             cursor: pointer;
