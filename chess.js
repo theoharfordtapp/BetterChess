@@ -1,16 +1,16 @@
 const pieces = {
-    'r': 'bR.png',
-    'n': 'bN.png',
-    'b': 'bB.png',
-    'q': 'bQ.png',
-    'k': 'bK.png',
-    'p': 'bP.png',
-    'R': 'wR.png',
-    'N': 'wN.png',
-    'B': 'wB.png',
-    'Q': 'wQ.png',
-    'K': 'wK.png',
-    'P': 'wP.png'
+    'r': 'br.png',
+    'n': 'bn.png',
+    'b': 'bb.png',
+    'q': 'bq.png',
+    'k': 'bk.png',
+    'p': 'bp.png',
+    'R': 'wr.png',
+    'N': 'wn.png',
+    'B': 'wb.png',
+    'Q': 'wq.png',
+    'K': 'wk.png',
+    'P': 'wp.png'
 };
 
 const initialBoard = [
