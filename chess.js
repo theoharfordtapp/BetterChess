@@ -119,7 +119,7 @@ function onSquareClick(event) {
         const newRow = parseInt(selectedSquare.dataset.row);
         const newCol = parseInt(selectedSquare.dataset.col);
         
-        initialBoard = movePiece(false, initialBoard, selectedPiece, selectedOldSquare, selectedSquare);
+        initialBoard = movePiece(true, initialBoard, selectedPiece, selectedOldSquare, selectedSquare);
         updateBoard();
         
         // Reset en passant tracking
@@ -262,7 +262,7 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
     
     if (!testingCheck) {
         throwawayBoard = structuredClone(boardState);
-        hypothetical = movePiece(true, throwawayBoard, piece, oldSquare, newSquare);
+        hypothetical = movePiece(false, throwawayBoard, piece, oldSquare, newSquare);
         
         if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
             return false;
@@ -385,7 +385,7 @@ function select(square, row, col) {
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
 }
 
-function movePiece(ignoreEnPassant, boardToUpdate, piece, oldSquare, newSquare) {
+function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     const newBoard = structuredClone(boardToUpdate);
     console.log(newBoard)
     
@@ -395,7 +395,7 @@ function movePiece(ignoreEnPassant, boardToUpdate, piece, oldSquare, newSquare) 
     const col = newSquare.dataset.col;
     
     // Handle en passant capture
-    if (!ignoreEnPassant && piece.toLowerCase() === 'p' && col !== oldCol && newBoard[row][col] === ' ') {
+    if (real && piece.toLowerCase() === 'p' && col !== oldCol && newBoard[row][col] === ' ') {
         newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
         newBoard[oldRow] = newBoard[oldRow].substring(0, col) + ' ' + newBoard[oldRow].substring(parseInt(col) + 1); // Remove the captured pawn
     } else {
@@ -404,21 +404,24 @@ function movePiece(ignoreEnPassant, boardToUpdate, piece, oldSquare, newSquare) 
     
     newBoard[row] = newBoard[row].substring(0, col) + piece + newBoard[row].substring(parseInt(col) + 1);
 
-    const sound = null
+    if (real) {
+        let sound = null
 
-    if (inCheck(initialBoard)) {
-        if ((!hasAnyMoves(initialBoard, findKing(initialBoard, true), 'K') && inCheck(initialBoard) == 'white') || !hasAnyMoves(initialBoard, findKing(initialBoard, false), 'k') && inCheck(initialBoard) == 'black') {
-            sound = new Audio('assets/audio/checkmate.wav');
+        if (inCheck(newBoard)) {
+            if ((!hasAnyMoves(newBoard, findKing(newBoard, true), 'K') && inCheck(newBoard) == 'white') || !hasAnyMoves(newBoard, findKing(newBoard, false), 'k') && inCheck(newBoard) == 'black') {
+                sound = new Audio('assets/audio/checkmate.wav');
+            } else {
+                sound = new Audio('assets/audio/check.wav');
+            }
+        } else if (newBoard.join('').replace(/\s/g, '').length !== boardToUpdate.join('').replace(/\s/g, '').length) {
+            sound = new Audio('assets/audio/capture.wav');
         } else {
-            sound = new Audio('assets/audio/check.wav');
+            sound = new Audio('assets/audio/move.wav')
         }
-    } else if (newBoard.join('').replace(/\s/g, '').length !== boardToUpdate.join('').replace(/\s/g, '').length) {
-        sound = new Audio('assets/audio/capture.wav');
-    } else {
-        sound = new Audio('assets/audio/move.wav')
-    }
 
-    sound.play()
+        sound.volume = 0.2;
+        sound.play()
+    }
     
     return newBoard;
 }
