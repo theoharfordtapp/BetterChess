@@ -273,7 +273,7 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
                 return true;
             }
             // Move two squares forward from the starting position
-            if (newRow === oldRow + 2 * direction && oldRow === (isWhite ? 6 : 1) && boardState[newRow - direction][newCol] === ' ' && boardState[newRow][newCol] === ' ') {
+            if (newRow === oldRow + 2 * direction && oldRow === (flipped ? (isWhite ? 1 : 6) : (isWhite ? 6 : 1)) && boardState[newRow - direction][newCol] === ' ' && boardState[newRow][newCol] === ' ') {
                 return true;
             }
         }
