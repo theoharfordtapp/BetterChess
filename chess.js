@@ -116,7 +116,6 @@ function onSquareClick(event) {
     
     if (selectedOldSquare && selectedSquare) {
         const oldRow = parseInt(selectedOldSquare.dataset.row);
-        const oldCol = parseInt(selectedOldSquare.dataset.col);
         const newRow = parseInt(selectedSquare.dataset.row);
         const newCol = parseInt(selectedSquare.dataset.col);
         
@@ -404,6 +403,22 @@ function movePiece(ignoreEnPassant, boardToUpdate, piece, oldSquare, newSquare) 
     }
     
     newBoard[row] = newBoard[row].substring(0, col) + piece + newBoard[row].substring(parseInt(col) + 1);
+
+    const sound = null
+
+    if (inCheck(initialBoard)) {
+        if ((!hasAnyMoves(initialBoard, findKing(initialBoard, true), 'K') && inCheck(initialBoard) == 'white') || !hasAnyMoves(initialBoard, findKing(initialBoard, false), 'k') && inCheck(initialBoard) == 'black') {
+            sound = new Audio('assets/audio/checkmate.wav');
+        } else {
+            sound = new Audio('assets/audio/check.wav');
+        }
+    } else if (newBoard.join('').replace(/\s/g, '').length !== boardToUpdate.join('').replace(/\s/g, '').length) {
+        sound = new Audio('assets/audio/capture.wav');
+    } else {
+        sound = new Audio('assets/audio/move.wav')
+    }
+
+    sound.play()
     
     return newBoard;
 }
