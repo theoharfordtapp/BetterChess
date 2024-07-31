@@ -42,7 +42,7 @@ let enPassantTargetSquare = null;
 
 let gameOverNotified = false;
 
-let flipBoard = true;
+let flipped = false;
 
 let theme = 'neo';
 
@@ -78,6 +78,23 @@ function placePieces() {
             }
         }
     }
+}
+
+function flipBoard() {
+    let newBoard = [];
+
+    initialBoard.forEach(row => {
+        const rowArray = row.split('');
+        const rowArrayReversed = rowArray.reverse();
+        const rowReversed = rowArrayReversed.join('');
+        newBoard,push(rowReversed);
+    })
+
+    newBoard = newBoard.reverse();
+
+    initialBoard = structuredClone(newBoard);
+
+    flipped = !flipped;
 }
 
 function onSquareClick(event) {
