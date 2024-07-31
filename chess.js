@@ -14,8 +14,8 @@ const pieces = {
 };
 
 const piecesLocal = {
-    'o': 'wo.png',
-    'O': 'bo.png',
+    'o': 'bo.png',
+    'O': 'wo.png',
 }
 
 let initialBoard = [
