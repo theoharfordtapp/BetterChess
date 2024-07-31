@@ -287,7 +287,11 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
     if (pieceType === 'o') {
         const rowDiff = Math.abs(newRow - oldRow);
         const colDiff = Math.abs(newCol - oldCol);
-        return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2) || isPathClear(oldRow, oldCol, newRow, newCol);
+        if (newRow === oldRow || newCol === oldCol) {
+            return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2) || isPathClear(oldRow, oldCol, newRow, newCol);
+        } else {
+            return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)
+        }
     }
 
     // Bishop moves
