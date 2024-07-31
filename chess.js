@@ -435,7 +435,7 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
         let sound = null
 
         if (inCheck(newBoard)) {
-            if ((!hasAnyMoves(newBoard, findKing(newBoard, true), 'K') && inCheck(newBoard) == 'white') || !hasAnyMoves(newBoard, findKing(newBoard, false), 'k') && inCheck(newBoard) == 'black') {
+            if (inCheckmate(newBoard)) {
                 sound = new Audio('assets/audio/checkmate.wav');
             } else {
                 sound = new Audio('assets/audio/check.wav');
