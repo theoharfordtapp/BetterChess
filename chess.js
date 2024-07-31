@@ -87,7 +87,7 @@ function flipBoard() {
         const rowArray = row.split('');
         const rowArrayReversed = rowArray.reverse();
         const rowReversed = rowArrayReversed.join('');
-        newBoard,push(rowReversed);
+        newBoard.push(rowReversed);
     })
 
     newBoard = newBoard.reverse();
