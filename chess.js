@@ -266,7 +266,7 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
 
     // Pawn moves
     if (pieceType === 'p') {
-        const direction = isWhite ? -1 : 1;
+        const direction = flipped ? (isWhite ? 1 : -1) : (isWhite ? -1 : 1);
         // Move one square forward
         if (newCol === oldCol) {
             if (newRow === oldRow + direction && boardState[newRow][newCol] === ' ') {
