@@ -37,7 +37,6 @@ let currentTurn = null;
 let check = false;
 let checkmate = false;
 
-let lastMovedPawn = null;
 let enPassantTargetSquare = null;
 
 let gameOverNotified = false;
@@ -94,6 +93,15 @@ function flipBoard() {
 
     initialBoard = structuredClone(newBoard);
 
+    if (enPassantTargetSquare) {
+        const newSquare = { dataset: { row: 7 - enPassantTargetSquare.dataset.row, col: 7 - enPassantTargetSquare.dataset.col } };
+        enPassantTargetSquare = newSquare;
+    }
+
+    if (selectedOldSquare) {
+        selectedOldSquare = null;
+    }
+    
     flipped = !flipped;
 }
 
@@ -116,12 +124,10 @@ function onSquareClick(event) {
         updateBoard();
         
         // Reset en passant tracking
-        lastMovedPawn = null;
         enPassantTargetSquare = null;
         
         // Track potential en passant targets
         if (selectedPiece.toLowerCase() === 'p' && Math.abs(newRow - oldRow) === 2) {
-            lastMovedPawn = selectedPiece;
             enPassantTargetSquare = { dataset: { row: (oldRow + newRow) / 2, col: newCol } };
         }
         
