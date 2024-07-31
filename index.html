@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chess</title>
     <style>
+        * {
+            font-family: Roboto, sans-serif;
+        }
         body {
             display: flex;
             justify-content: center;
@@ -18,28 +21,27 @@
             box-sizing: border-box;
         }
         body.check {
-            background-color: #ffefd6;
-        }
-        body.checkmate {
-            background-color: #ffceb0;
+            background-color: #ffe3c7;
         }
         button {
             border: 0;
             background-color: #00000010;
             color: #111111;
             font-size: 100%;
-            margin: 1vh;
-            border-radius: 14%;
+            margin: 2vmin;
+            border-radius: 8px;
             padding: 1vh 2vh;
-            transition: 0.3s;
+            transition: 0.6s;
             cursor: pointer;
+            position: relative;
+            z-index: 3;
+            font-weight: bold;
         }
         button:hover {
             background-color: #00000020;
         }
         p {
             font-size: 3.2vw;
-            font-family: Roboto, sans-serif;
             margin: 1rem 0;
         }
         @media screen and (min-width: 720px) {
@@ -47,7 +49,7 @@
                 font-size: 18px;
             }
             button {
-                width: 84px;
+                width: 90px;
             }
         }
         #chessboard {
@@ -59,6 +61,7 @@
             height: 90vmin;
             max-width: 640px;
             max-height: 640px;
+            z-index: 1;
         }
         .dot {
             display: block;
@@ -94,16 +97,42 @@
             width: 100%;
             height: 100%;
         }
+        .blur {
+            opacity: 0;
+            display: flex;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            backdrop-filter: blur(12px);
+            transition: 0.8s;
+            z-index: -1;
+            text-align: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .blur.visible {
+            opacity: 100%;
+            z-index: 2;
+        }
+        .invisible {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div id="chessboard"></div>
     <div id="options">
-        <button onclick="theme = 'classic'; updateBoard();">Classic</button>
-        <button onclick="theme = 'neo'; updateBoard();">Neo</button>
-        <button onclick="flipBoard(); updateBoard();">Flip</button>
+        <button onclick="toggleTheme();">Theme</button>
+        <button onclick="flipBoard();">Flip</button>
+        <button onclick="toggleMute();" id="mute">Mute</button>
         <button onclick="location.reload();">Restart</button>
+        <button onclick="viewBoard();" id="viewButton" class="invisible">View</button>
     </div>
+    <div class="blur" id="blurScreen"></div>
     <script src="chess.js"></script>
 </body>
 </html>

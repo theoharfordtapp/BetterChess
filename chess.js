@@ -39,10 +39,9 @@ let checkmate = false;
 
 let enPassantTargetSquare = null;
 
-let gameOverNotified = false;
-
 let flipped = false;
 
+let mute = false;
 let theme = 'neo';
 
 function createBoard() {
@@ -79,6 +78,21 @@ function placePieces() {
     }
 }
 
+function toggleTheme() {
+    theme = (theme == 'neo') ? 'classic' : 'neo';
+
+    updateBoard();
+}
+
+function toggleMute() {
+    mute = (mute) ? false : true;
+
+    const muteButton = document.getElementById('mute');
+    muteButton.innerHTML = mute ? 'Unmute' : 'Mute';
+    
+    updateBoard();
+}
+
 function flipBoard() {
     let newBoard = [];
 
@@ -103,6 +117,8 @@ function flipBoard() {
     }
     
     flipped = !flipped;
+
+    updateBoard();
 }
 
 function onSquareClick(event) {
@@ -404,7 +420,7 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     
     newBoard[row] = newBoard[row].substring(0, col) + piece + newBoard[row].substring(parseInt(col) + 1);
 
-    if (real) {
+    if (real && !mute) {
         let sound = null
 
         if (inCheck(newBoard)) {
@@ -426,12 +442,22 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     return newBoard;
 }
 
+function viewBoard() {
+    const blurScreen = document.getElementById('blurScreen');
+    
+    blurScreen.classList.remove('visible');
+
+    const viewButton = document.getElementById('viewButton');
+    
+    viewButton.classList.add('invisible');
+}
+
 function updateBoard() {
     const board = document.getElementById('chessboard').children;
     if (inCheck(initialBoard)) {
         if ((!hasAnyMoves(initialBoard, findKing(initialBoard, true), 'K') && inCheck(initialBoard) == 'white') || !hasAnyMoves(initialBoard, findKing(initialBoard, false), 'k') && inCheck(initialBoard) == 'black') {
             checkmate = true;
-            document.body.classList.add('checkmate');
+            document.body.classList.add('check');
         } else {
             check = true;
             document.body.classList.add('check');
@@ -439,7 +465,6 @@ function updateBoard() {
     } else {
         check = false;
         document.body.classList.remove('check');
-        document.body.classList.remove('checkmate');
     }
     for (let i = 0; i < board.length; i++) {
         const square = board[i];
@@ -468,7 +493,7 @@ function updateBoard() {
             }
         }
     }
-    if (checkmate && !gameOverNotified) {
+    if (checkmate) {
         let winner = '';
         if (inCheck(initialBoard) == 'white') {
             winner = 'Black';
@@ -476,12 +501,14 @@ function updateBoard() {
             winner = 'White';
         }
         
-        gameOverText = document.createElement('p');
-        gameOverText.innerHTML = `${winner} wins!`;
-        
-        document.body.appendChild(gameOverText);
+        const blurScreen = document.getElementById('blurScreen');
 
-        gameOverNotified = true;
+        blurScreen.classList.add('visible')
+        blurScreen.innerHTML = `${winner} wins!`;
+
+        const viewButton = document.getElementById('viewButton');
+
+        viewButton.classList.remove('invisible');
     }
 }
 
