@@ -199,13 +199,16 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
         const colDiff = endCol - startCol;
         const stepRow = rowDiff === 0 ? 0 : rowDiff / Math.abs(rowDiff);
         const stepCol = colDiff === 0 ? 0 : colDiff / Math.abs(colDiff);
-
+    
         let row = startRow + stepRow;
         let col = startCol + stepCol;
-
+    
         while (row !== endRow || col !== endCol) {
+            if (row < 0 || row > 7 || col < 0 || col > 7) {
+                return false; // Out of bounds
+            }
             console.log(row, col);
-            console.log(boardState[row][col]);
+            console.log(boardState[row][col]); // this line specifically
             if (boardState[row][col] !== ' ') {
                 return false;
             }
@@ -214,6 +217,7 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
         }
         return true;
     }
+
 
     // Check if move is within bounds
     if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) {
@@ -287,12 +291,20 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
     if (pieceType === 'o') {
         const rowDiff = Math.abs(newRow - oldRow);
         const colDiff = Math.abs(newCol - oldCol);
+    
+        // Rook-like move
         if (newRow === oldRow || newCol === oldCol) {
-            return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2) || isPathClear(oldRow, oldCol, newRow, newCol);
-        } else {
-            return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)
+            return isPathClear(oldRow, oldCol, newRow, newCol);
         }
+        
+        // Knight-like move
+        if ((rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)) {
+            return true;
+        }
+        
+        return false;
     }
+
 
     // Bishop moves
     if (pieceType === 'b') {
