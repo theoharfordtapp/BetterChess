@@ -28,14 +28,14 @@
             background-color: #00000010;
             color: #111111;
             font-size: 100%;
-            margin: 2vmin;
             border-radius: 8px;
-            padding: 1vh 2vh;
             transition: 0.6s;
             cursor: pointer;
             position: relative;
             z-index: 3;
             font-weight: bold;
+            margin: 2vmin;
+            padding: 1vh 2vh;
         }
         button:hover {
             background-color: #00000020;
@@ -50,6 +50,18 @@
             }
             button {
                 width: 90px;
+            }
+        }
+        @media screen and (max-width: 480px) {
+            button {
+                margin: 2vmin 1.4vmin;
+                padding: 0.6vh 1.2vh;
+            }
+        }
+        @media screen and (max-width: 350px) {
+            button {
+                margin: 4vmin 1vmin;
+                padding: 0.4vh 0.8vh;
             }
         }
         #chessboard {
