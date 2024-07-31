@@ -10,8 +10,13 @@ const pieces = {
     'B': 'wb.png',
     'Q': 'wq.png',
     'K': 'wk.png',
-    'P': 'wp.png'
+    'P': 'wp.png',
 };
+
+const piecesLocal = {
+    'o': 'wo.png',
+    'O': 'bo.png',
+}
 
 let initialBoard = [
     'rnbqkbnr',
@@ -377,7 +382,8 @@ function updateBoard() {
         const piece = initialBoard[row][col];
         if (piece !== ' ') {
             const img = document.createElement('img');
-            img.src = `https://images.chesscomfiles.com/chess-themes/pieces/${theme}/150/${pieces[piece]}`;
+            if (piece in pieces) { img.src = `https://images.chesscomfiles.com/chess-themes/pieces/${theme}/150/${pieces[piece]}`; }
+            else { img.src = `assets/${piecesLocal[piece]}`; }
             img.className = 'piece';
             square.appendChild(img);
         }
