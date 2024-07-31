@@ -71,7 +71,8 @@ function placePieces() {
             const piece = initialBoard[row][col];
             if (piece !== ' ') {
                 const img = document.createElement('img');
-                img.src = `https://images.chesscomfiles.com/chess-themes/pieces/${theme}/150/${pieces[piece]}`;
+                if (piece in pieces) { img.src = `https://images.chesscomfiles.com/chess-themes/pieces/${theme}/150/${pieces[piece]}`; }
+                else { img.src = `assets/${theme}/${piecesLocal[piece]}`; }
                 img.className = 'piece';
                 board[row * 8 + col].appendChild(img);
             }
@@ -408,7 +409,7 @@ function updateBoard() {
         if (piece !== ' ') {
             const img = document.createElement('img');
             if (piece in pieces) { img.src = `https://images.chesscomfiles.com/chess-themes/pieces/${theme}/150/${pieces[piece]}`; }
-            else { img.src = `assets/${piecesLocal[piece]}`; }
+            else { img.src = `assets/${theme}/${piecesLocal[piece]}`; }
             img.className = 'piece';
             square.appendChild(img);
         }
