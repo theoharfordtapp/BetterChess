@@ -204,7 +204,8 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
         let col = startCol + stepCol;
 
         while (row !== endRow || col !== endCol) {
-            console.log(row, col, boardState[row][col]);
+            console.log(row, col);
+            console.log(boardState[row][col]);
             if (boardState[row][col] !== ' ') {
                 return false;
             }
