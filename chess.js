@@ -16,22 +16,32 @@ const pieces = {
 const piecesLocal = {
     'o': 'bo.png',
     'O': 'wo.png',
+    'j': 'bj.png',
+    'J': 'wj.png',
 }
 
 let initialBoard = [
     'onbqkbnr',
-    'pppppppp',
+    'pppppppj',
     '        ',
     '        ',
     '        ',
     '        ',
-    'PPPPPPPP',
+    'JPPPPPPP',
     'RNBQKBNO'
 ];
 
 let selectedPiece = null;
 let selectedOldSquare = null;
 let selectedSquare = null;
+
+let lastSelectedOldSquare = null;
+let lastSelectedSquare = null;
+
+let blackJoeOldSquare = null;
+let blackJoeSquare = null;
+let whiteJoeOldSquare = null;
+let whiteJoeSquare = null;
 
 let currentTurn = null;
 let check = false;
@@ -43,6 +53,10 @@ let flipped = false;
 
 let mute = false;
 let theme = 'neo';
+
+let joeBidenTurns = 5;
+
+let firstMove = true;
 
 function createBoard() {
     const board = document.getElementById('chessboard');
@@ -73,6 +87,11 @@ function placePieces() {
                 else { img.src = `assets/${theme}/${piecesLocal[piece]}`; }
                 img.className = 'piece';
                 board[row * 8 + col].appendChild(img);
+                if (piece == 'j') {
+                    blackJoeSquare = { dataset: { row: row, col: col } };
+                } else if (piece == 'J') {
+                    whiteJoeSquare = { dataset: { row: row, col: col } };
+                }
             }
         }
     }
@@ -136,7 +155,6 @@ function onSquareClick(event) {
         const newCol = parseInt(selectedSquare.dataset.col);
         
         initialBoard = movePiece(true, initialBoard, selectedPiece, selectedOldSquare, selectedSquare);
-        updateBoard();
         
         // Reset en passant tracking
         enPassantTargetSquare = null;
@@ -148,13 +166,19 @@ function onSquareClick(event) {
         
         console.log(`Moved ${selectedPiece} from ${selectedOldSquare} to ${selectedSquare}`);
         currentTurn = !(selectedPiece == selectedPiece.toLowerCase());
+        lastSelectedOldSquare = selectedOldSquare;
+        lastSelectedSquare = selectedSquare;
         selectedPiece = null;
         selectedOldSquare = null;
         selectedSquare = null;
+        blackJoeOldSquare = blackJoeSquare;
+        whiteJoeOldSquare = whiteJoeSquare;
+
+        firstMove = false;
     } else {
         console.log(`Selected ${selectedPiece}`);
     }
-
+    
     updateBoard();
 }
 
@@ -184,7 +208,6 @@ function inCheckmate(boardState) {
                     whiteInCheckmate = false;
                     if (blackInCheckmate == false) { return false; }
                 }
-                console.log(`${row}, ${col} can move`)
             }
         }
     }
@@ -269,8 +292,6 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
             if (row < 0 || row > 7 || col < 0 || col > 7) {
                 return false; // Out of bounds
             }
-            console.log(row, col);
-            console.log(boardState[row][col]); // this line specifically
             if (boardState[row][col] !== ' ') {
                 return false;
             }
@@ -397,14 +418,17 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
 
 function select(square, row, col) {
     const piece = initialBoard[row][col];
+
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
     if (selectedOldSquare !== null && selectedSquare == null) {
-        if (checkValidMove(initialBoard, false, selectedPiece, selectedOldSquare, square) == true) {
-            console.log(`Selecting square`);
+        console.log('Selecting square')
+        if (checkValidMove(initialBoard, false, selectedPiece, selectedOldSquare, square)) {
+            console.log('Valid move')
+
             selectedSquare = square;
         } else {
             console.log('Invalid move, resetting');
-            if (piece !== ' ') {
+            if (piece !== ' ' && piece !== 'j' && piece !== 'J') {
                 if (currentTurn == null || (piece == piece.toLowerCase()) == currentTurn) {
                     selectedPiece = piece;
                     selectedOldSquare = square;
@@ -414,7 +438,7 @@ function select(square, row, col) {
                 selectedOldSquare = null;
             }
         }
-    } else if (selectedOldSquare == null && piece !== ' ') {
+    } else if (selectedOldSquare == null && piece !== ' ' && piece !== 'j' & piece !== 'J') {
         if (currentTurn == null || (piece == piece.toLowerCase()) == currentTurn) {
             console.log(`Selecting piece`);
             selectedOldSquare = square;
@@ -426,7 +450,6 @@ function select(square, row, col) {
 
 function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     const newBoard = structuredClone(boardToUpdate);
-    console.log(newBoard)
     
     const oldRow = oldSquare.dataset.row;
     const oldCol = oldSquare.dataset.col;
@@ -461,6 +484,8 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
         sound.volume = 0.2;
         sound.play()
     }
+
+    if (real) { joeBidenTurns--; }
     
     return newBoard;
 }
@@ -476,6 +501,51 @@ function viewBoard() {
 }
 
 function updateBoard() {
+    if (joeBidenTurns < 1) {
+        let bidenSound = null
+        if (initialBoard.join('').includes('j')) {
+            let row = Math.ceil(Math.random() * 7);
+            let col = Math.ceil(Math.random() * 7);
+            
+            while (initialBoard[row][col] == 'k' || initialBoard[row][col] == 'K') {
+                row = Math.ceil(Math.random() * 7);
+                col = Math.ceil(Math.random() * 7);
+            }
+
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    if (initialBoard[r][c] === 'j') {
+                        blackJoeSquare = { dataset: { row: row, col: col } };
+                        initialBoard = movePiece(true, initialBoard, 'j', { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } });
+                    }
+                }
+            }
+            
+            bidenSound = new Audio('assets/audio/joebiden.wav');
+        }
+        if (initialBoard.join('').includes('J')) {
+            let row = Math.ceil(Math.random() * 7);
+            let col = Math.ceil(Math.random() * 7);
+            
+            while (initialBoard[row][col] == 'k' || initialBoard[row][col] == 'J') {
+                row = Math.ceil(Math.random() * 7);
+                col = Math.ceil(Math.random() * 7);
+            }
+            
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    if (initialBoard[r][c] === 'J') {
+                        whiteJoeOldSquare = whiteJoeSquare;
+                        whiteJoeSquare = { dataset: { row: row, col: col } };
+                        initialBoard = movePiece(true, initialBoard, 'J', { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } });
+                    }
+                }
+            }
+            bidenSound = new Audio('assets/audio/joebiden.wav');
+        }
+        if (!mute && bidenSound) { bidenSound.play(); }
+        joeBidenTurns = 5;
+    }
     const board = document.getElementById('chessboard').children;
     if (inCheck(initialBoard)) {
         if (inCheckmate(initialBoard)) {
@@ -503,11 +573,33 @@ function updateBoard() {
             square.appendChild(img);
         }
         if (square == selectedOldSquare) {
-            square.classList.add('highlighted');
+            square.classList.add('yellow');
         } else {
-            square.classList.remove('highlighted');
+            square.classList.remove('yellow');
         }
-
+        if (square == lastSelectedOldSquare || square == lastSelectedSquare) {
+            square.classList.add('green');
+        } else {
+            square.classList.remove('green');
+        }
+        if (square.dataset.row == blackJoeSquare.dataset.row && square.dataset.col == blackJoeSquare.dataset.col) {
+            square.classList.add('red');
+        }
+        if (square.dataset.row == whiteJoeSquare.dataset.row && square.dataset.col == whiteJoeSquare.dataset.col) {
+            square.classList.add('blue');
+        }
+        if (blackJoeOldSquare && whiteJoeOldSquare) {
+            if (square.dataset.row == blackJoeOldSquare.dataset.row && square.dataset.col == blackJoeOldSquare.dataset.col) {
+                square.classList.add('red');
+            }
+            if (square.dataset.row == whiteJoeOldSquare.dataset.row && square.dataset.col == whiteJoeOldSquare.dataset.col) {
+                square.classList.add('blue');
+            }
+        }
+        if (joeBidenTurns < 5 || firstMove) {
+            square.classList.remove('red');
+            square.classList.remove('blue');
+        }
         if (selectedPiece !== null && selectedOldSquare !== null) {
             if (checkValidMove(initialBoard, false, selectedPiece, selectedOldSquare, square)) {
                 const dot = document.createElement('div');
