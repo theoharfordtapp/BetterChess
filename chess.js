@@ -171,14 +171,26 @@ function hasAnyMoves(boardState, square) {
 }
 
 function inCheckmate(boardState) {
-    for (let row = 0; row < 8; row++) {
+    let blackInCheckmate = true;
+    let whiteInCheckmate = true;
+    rowloop: for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
             if (hasAnyMoves(boardState, { dataset: { row: row, col: col } })) {
-                return false;
+                if (boardState[row][col] == boardState[row][col].toLowerCase()) {
+                    blackInCheckmate = false;
+                    if (whiteInCheckmate == false) { return false; }
+                }
+                if (boardState[row][col] != boardState[row][col].toLowerCase()) {
+                    whiteInCheckmate = false;
+                    if (blackInCheckmate == false) { return false; }
+                }
+                console.log(`${row}, ${col} can move`)
             }
         }
     }
-    return true;
+    if (whiteInCheckmate) { return 'white'; }
+    else if (blackInCheckmate) { return 'black'; }
+    else { return false; }
 }
 
 // Find the king's position for a given team
