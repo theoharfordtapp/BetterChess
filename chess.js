@@ -501,6 +501,14 @@ function viewBoard() {
 }
 
 function updateBoard() {
+    if (!initialBoard.join('').includes('j')) {
+        blackJoeOldSquare = null;
+        blackJoeSquare = null;
+    }
+    if (!initialBoard.join('').includes('J')) {
+        whiteJoeOldSquare = null;
+        whiteJoeSquare = null;
+    }
     if (joeBidenTurns < 1) {
         let bidenSound = null
         if (initialBoard.join('').includes('j')) {
@@ -582,16 +590,22 @@ function updateBoard() {
         } else {
             square.classList.remove('green');
         }
-        if (square.dataset.row == blackJoeSquare.dataset.row && square.dataset.col == blackJoeSquare.dataset.col) {
-            square.classList.add('red');
+        if (blackJoeSquare) {
+            if (square.dataset.row == blackJoeSquare.dataset.row && square.dataset.col == blackJoeSquare.dataset.col) {
+                square.classList.add('red');
+            }
         }
-        if (square.dataset.row == whiteJoeSquare.dataset.row && square.dataset.col == whiteJoeSquare.dataset.col) {
-            square.classList.add('blue');
+        if (whiteJoeSquare) {
+            if (square.dataset.row == whiteJoeSquare.dataset.row && square.dataset.col == whiteJoeSquare.dataset.col) {
+                square.classList.add('blue');
+            }
         }
-        if (blackJoeOldSquare && whiteJoeOldSquare) {
+        if (blackJoeOldSquare) {
             if (square.dataset.row == blackJoeOldSquare.dataset.row && square.dataset.col == blackJoeOldSquare.dataset.col) {
                 square.classList.add('red');
             }
+        }
+        if (whiteJoeOldSquare) {
             if (square.dataset.row == whiteJoeOldSquare.dataset.row && square.dataset.col == whiteJoeOldSquare.dataset.col) {
                 square.classList.add('blue');
             }
