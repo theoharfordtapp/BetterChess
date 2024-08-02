@@ -24,12 +24,12 @@ const piecesLocal = {
 
 let initialBoard = [
     'rnbqkbno',
-    'jeppppee',
+    'eeppppee',
     '        ',
     '        ',
     '        ',
     '        ',
-    'JEPPPPEE',
+    'EEPPPPEE',
     'RNBQKBNO'
 ];
 
@@ -61,6 +61,8 @@ let theme = 'neo';
 let joeBidenTurns = 5;
 
 let firstMove = true;
+
+let bidensStarted = false;
 
 function createBoard() {
     const board = document.getElementById('chessboard');
@@ -533,10 +535,10 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     }
     
     newBoard[row] = newBoard[row].substring(0, col) + piece + newBoard[row].substring(parseInt(col) + 1);
-
+    
     if (real && !mute) {
         let sound = null
-
+        
         if (newBoard[0].toLowerCase().includes('p') || newBoard[7].toLowerCase().includes('p')) {
             // pass
         } else if (inCheck(newBoard)) {
@@ -552,13 +554,13 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
         } else {
             sound = new Audio('assets/audio/move.wav')
         }
-
+        
         if (sound) {
             sound.volume = 0.6;
             sound.play()
         }
     }
-
+    
     if (real) { joeBidenTurns--; }
     
     return newBoard;
@@ -568,7 +570,7 @@ function viewBoard() {
     const blurScreen = document.getElementById('blurScreen');
     
     blurScreen.classList.remove('visible');
-
+    
     const viewButton = document.getElementById('viewButton');
     
     viewButton.classList.add('invisible');
@@ -603,45 +605,64 @@ async function updateBoard() {
     }
     if (joeBidenTurns < 1) {
         let bidenSound = null
-        if (initialBoard.join('').includes('j')) {
-            let row = Math.ceil(Math.random() * 7);
-            let col = Math.ceil(Math.random() * 7);
-            
-            while (initialBoard[row][col] == 'k' || initialBoard[row][col] == 'K') {
-                row = Math.ceil(Math.random() * 7);
-                col = Math.ceil(Math.random() * 7);
-            }
+        if (!bidensStarted) {
+            ['j', 'J'].forEach(piece => {
+                let row = Math.ceil(Math.random() * 7);
+                let col = Math.ceil(Math.random() * 7);
+                
+                while (initialBoard[row][col] == 'k' || initialBoard[row][col] == 'K' || initialBoard[row][col] == 'j' || initialBoard[row][col] == 'J') {
+                    row = Math.ceil(Math.random() * 7);
+                    col = Math.ceil(Math.random() * 7);
+                }
+                
+                if (piece == 'j') { blackJoeSquare = { dataset: { row: row, col: col } } }
+                else if (piece == 'J') { whiteJoeSquare = { dataset: { row: row, col: col } } }
 
-            for (let r = 0; r < 8; r++) {
-                for (let c = 0; c < 8; c++) {
-                    if (initialBoard[r][c] === 'j') {
-                        blackJoeSquare = { dataset: { row: row, col: col } };
-                        initialBoard = movePiece(true, initialBoard, 'j', { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } });
+                initialBoard[row] = initialBoard[row].substring(0, col) + piece + initialBoard[row].substring(parseInt(col) + 1);
+            });
+            bidenSound = new Audio('assets/audio/joebiden.wav');
+            bidensStarted = true;
+        } else {
+            if (initialBoard.join('').includes('j')) {
+                let row = Math.ceil(Math.random() * 7);
+                let col = Math.ceil(Math.random() * 7);
+                
+                while (initialBoard[row][col] == 'k' || initialBoard[row][col] == 'K') {
+                    row = Math.ceil(Math.random() * 7);
+                    col = Math.ceil(Math.random() * 7);
+                }
+
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        if (initialBoard[r][c] === 'j') {
+                            blackJoeSquare = { dataset: { row: row, col: col } };
+                            initialBoard = movePiece(true, initialBoard, 'j', { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } });
+                        }
                     }
                 }
+                
+                bidenSound = new Audio('assets/audio/joebiden.wav');
             }
-            
-            bidenSound = new Audio('assets/audio/joebiden.wav');
-        }
-        if (initialBoard.join('').includes('J')) {
-            let row = Math.ceil(Math.random() * 7);
-            let col = Math.ceil(Math.random() * 7);
-            
-            while (initialBoard[row][col] == 'k' || initialBoard[row][col] == 'J') {
-                row = Math.ceil(Math.random() * 7);
-                col = Math.ceil(Math.random() * 7);
-            }
-            
-            for (let r = 0; r < 8; r++) {
-                for (let c = 0; c < 8; c++) {
-                    if (initialBoard[r][c] === 'J') {
-                        whiteJoeOldSquare = whiteJoeSquare;
-                        whiteJoeSquare = { dataset: { row: row, col: col } };
-                        initialBoard = movePiece(true, initialBoard, 'J', { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } });
+            if (initialBoard.join('').includes('J')) {
+                let row = Math.ceil(Math.random() * 7);
+                let col = Math.ceil(Math.random() * 7);
+                
+                while (initialBoard[row][col] == 'k' || initialBoard[row][col] == 'J') {
+                    row = Math.ceil(Math.random() * 7);
+                    col = Math.ceil(Math.random() * 7);
+                }
+                
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        if (initialBoard[r][c] === 'J') {
+                            whiteJoeOldSquare = whiteJoeSquare;
+                            whiteJoeSquare = { dataset: { row: row, col: col } };
+                            initialBoard = movePiece(true, initialBoard, 'J', { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } });
+                        }
                     }
                 }
+                bidenSound = new Audio('assets/audio/joebiden.wav');
             }
-            bidenSound = new Audio('assets/audio/joebiden.wav');
         }
         if (!mute && bidenSound) { bidenSound.play(); }
         joeBidenTurns = 5;
