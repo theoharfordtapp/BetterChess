@@ -253,13 +253,21 @@ function inCheck(boardState) {
     const whiteKingPos = findKing(boardState, true);
     const blackKingPos = findKing(boardState, false);
 
-    if (whiteKingPos === null || blackKingPos === null) {
-        throw new Error("King not found on the board!");
-    }
+    let whiteKingInCheck = null;
+    let blackKingInCheck = null;
 
-    // Check if either king's position is under attack
-    const whiteKingInCheck = isUnderAttack(whiteKingPos.dataset.row, whiteKingPos.dataset.col, true);
-    const blackKingInCheck = isUnderAttack(blackKingPos.dataset.row, blackKingPos.dataset.col, false);
+    if (whiteKingPos === null && blackKingPos === null) {
+        console.log("King not found on the board!");
+    } else if (whiteKingPos === null) {
+        console.log("White king not found on the board!");
+        blackKingInCheck = isUnderAttack(blackKingPos.dataset.row, blackKingPos.dataset.col, false);
+    } else if (blackKingPos === null) {
+        console.log("Black king not found on the board!");
+        whiteKingInCheck = isUnderAttack(whiteKingPos.dataset.row, whiteKingPos.dataset.col, true);
+    } else {
+        whiteKingInCheck = isUnderAttack(whiteKingPos.dataset.row, whiteKingPos.dataset.col, true);
+        blackKingInCheck = isUnderAttack(blackKingPos.dataset.row, blackKingPos.dataset.col, false);
+    }
 
     if (whiteKingInCheck && blackKingInCheck) {
         return 'both'; // Both kings are in check (shouldn't typically happen in a normal game)
