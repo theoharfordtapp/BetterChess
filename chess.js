@@ -242,6 +242,11 @@ function inCheck(boardState) {
                 if (piece !== ' ' && (piece === piece.toUpperCase()) !== isWhite) {
                     if (checkValidMove(boardState, true, piece, { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } })) {
                         return true;
+                    } else if (piece.toLowerCase() == 'e' && (piece === piece.toUpperCase()) !== isWhite) {
+                        const direction = isWhite ? -1 : 1;
+                        if (checkValidMove(boardState, true, piece, { dataset: { row: r, col: c } }, { dataset: { row: row-(direction), col: col } })) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -255,20 +260,17 @@ function inCheck(boardState) {
 
     let whiteKingInCheck = null;
     let blackKingInCheck = null;
-
-    if (whiteKingPos === null && blackKingPos === null) {
-        console.log("King not found on the board!");
-    } else if (whiteKingPos === null) {
-        console.log("White king not found on the board!");
-        blackKingInCheck = isUnderAttack(blackKingPos.dataset.row, blackKingPos.dataset.col, false);
-    } else if (blackKingPos === null) {
-        console.log("Black king not found on the board!");
-        whiteKingInCheck = isUnderAttack(whiteKingPos.dataset.row, whiteKingPos.dataset.col, true);
-    } else {
+    
+    if (whiteKingPos !== null && blackKingPos !== null) {
         whiteKingInCheck = isUnderAttack(whiteKingPos.dataset.row, whiteKingPos.dataset.col, true);
         blackKingInCheck = isUnderAttack(blackKingPos.dataset.row, blackKingPos.dataset.col, false);
+    } else if (whiteKingPos === null && blackKingPos !== null) {
+        // console.log("White king not found on the board!");
+        blackKingInCheck = isUnderAttack(blackKingPos.dataset.row, blackKingPos.dataset.col, false);
+    } else if (blackKingPos === null && whiteKingPos !== null) {
+        // console.log("Black king not found on the board!");
+        whiteKingInCheck = isUnderAttack(whiteKingPos.dataset.row, whiteKingPos.dataset.col, true);
     }
-
     if (whiteKingInCheck && blackKingInCheck) {
         return 'both'; // Both kings are in check (shouldn't typically happen in a normal game)
     } else if (whiteKingInCheck) {
@@ -376,7 +378,7 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
             }
         }
         // En passant
-        else if (Math.abs(newCol - oldCol) === 1 && newRow === oldRow + direction && boardState[oldRow][newCol] !== ' ' && boardState[oldRow][newCol] !== 'k' && boardState[oldRow][newCol] !== 'K' && boardState[newRow][newCol] === ' ' && (boardState[oldRow][newCol].toUpperCase() == boardState[oldRow][newCol]) !== isWhite) {
+        else if (Math.abs(newCol - oldCol) === 1 && newRow === oldRow + direction && boardState[oldRow][newCol] !== ' ' && boardState[newRow][newCol] === ' ' && (boardState[oldRow][newCol].toUpperCase() == boardState[oldRow][newCol]) !== isWhite) {
             return true;
         }
 
