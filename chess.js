@@ -18,16 +18,18 @@ const piecesLocal = {
     'O': 'wo.png',
     'j': 'bj.png',
     'J': 'wj.png',
+    'e': 'be.png',
+    'E': 'we.png',
 }
 
 let initialBoard = [
-    'onbqkbnr',
-    'pppppppj',
+    'rnbqkbno',
+    'jepepepe',
     '        ',
     '        ',
     '        ',
     '        ',
-    'JPPPPPPP',
+    'JEPEPEPE',
     'RNBQKBNO'
 ];
 
@@ -104,7 +106,7 @@ function toggleTheme() {
 }
 
 function toggleMute() {
-    mute = (mute) ? false : true;
+    mute = !mute
 
     const muteButton = document.getElementById('mute');
     muteButton.innerHTML = mute ? 'Unmute' : 'Mute';
@@ -355,6 +357,22 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
         return false;
     }
 
+    if (pieceType === 'e') {
+        const direction = flipped ? (isWhite ? 1 : -1) : (isWhite ? -1 : 1);
+        // Move one square forward
+        if (newCol === oldCol) {
+            if (newRow === oldRow + direction && boardState[newRow][newCol] === ' ') {
+                return true;
+            }
+        }
+        // En passant
+        else if (Math.abs(newCol - oldCol) === 1 && newRow === oldRow + direction && boardState[oldRow][newCol] !== ' ' && boardState[oldRow][newCol] !== 'k' && boardState[oldRow][newCol] !== 'K' && boardState[newRow][newCol] === ' ' && (boardState[oldRow][newCol].toUpperCase() == boardState[oldRow][newCol]) !== isWhite) {
+            return true;
+        }
+
+        return false;
+    }
+
     // Rook moves
     if (pieceType === 'r') {
         if (newRow === oldRow || newCol === oldCol) {
@@ -457,7 +475,7 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     const col = newSquare.dataset.col;
     
     // Handle en passant capture
-    if (real && piece.toLowerCase() === 'p' && col !== oldCol && newBoard[row][col] === ' ') {
+    if (real && piece.toLowerCase() === 'p' || piece.toLowerCase() === 'e' && col !== oldCol && newBoard[row][col] === ' ') {
         newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
         newBoard[oldRow] = newBoard[oldRow].substring(0, col) + ' ' + newBoard[oldRow].substring(parseInt(col) + 1); // Remove the captured pawn
     } else {
