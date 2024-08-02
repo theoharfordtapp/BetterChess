@@ -24,12 +24,12 @@ const piecesLocal = {
 
 let initialBoard = [
     'rnbqkbno',
-    'jepepepe',
+    'jeppppee',
     '        ',
     '        ',
     '        ',
     '        ',
-    'JEPEPEPE',
+    'JEPPPPEE',
     'RNBQKBNO'
 ];
 
@@ -478,6 +478,43 @@ function select(square, row, col) {
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
 }
 
+function promote(boardState, square) {
+    return new Promise((resolve) => {
+        const isWhite = (boardState[square.dataset.row][square.dataset.col] == boardState[square.dataset.row][square.dataset.col].toUpperCase());
+
+        const promotionWindow = document.createElement('div');
+        promotionWindow.classList.add('promotion');
+
+        ['q', 'o', 'r', 'b', 'n', 'e'].forEach(option => {
+            const piece = isWhite ? option.toUpperCase() : option;
+
+            const optionButton = document.createElement('button');
+            optionButton.classList.add('promotionButton');
+
+            const img = document.createElement('img');
+            if (piece in pieces) { img.src = `https://images.chesscomfiles.com/chess-themes/pieces/${theme}/150/${pieces[piece]}`; }
+            else { img.src = `assets/${theme}/${piecesLocal[piece]}`; }
+            img.className = 'piece';
+
+            optionButton.appendChild(img);
+            promotionWindow.append(optionButton);
+
+            optionButton.addEventListener('click', () => {
+                let rowArray = boardState[square.dataset.row].split('');
+                rowArray[square.dataset.col] = piece;
+                boardState[square.dataset.row] = rowArray.join('');
+                promotionWindow.remove();
+                const sound = new Audio('assets/audio/promote.wav');
+                sound.volume = 0.75;
+                sound.play();
+                resolve(boardState);
+            });
+        });
+;
+        document.body.appendChild(promotionWindow);
+    })
+}
+
 function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     const newBoard = structuredClone(boardToUpdate);
     
@@ -500,7 +537,9 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     if (real && !mute) {
         let sound = null
 
-        if (inCheck(newBoard)) {
+        if (newBoard[0].toLowerCase().includes('p') || newBoard[7].toLowerCase().includes('p')) {
+            // pass
+        } else if (inCheck(newBoard)) {
             if (inCheckmate(newBoard)) {
                 sound = new Audio('assets/audio/checkmate.wav');
             } else {
@@ -514,8 +553,10 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
             sound = new Audio('assets/audio/move.wav')
         }
 
-        sound.volume = 0.2;
-        sound.play()
+        if (sound) {
+            sound.volume = 0.6;
+            sound.play()
+        }
     }
 
     if (real) { joeBidenTurns--; }
@@ -533,7 +574,25 @@ function viewBoard() {
     viewButton.classList.add('invisible');
 }
 
-function updateBoard() {
+async function updateBoard() {
+    if (initialBoard[0].toLowerCase().includes('p')) {
+        for (let i = 0; i < 8; i++) {
+            const piece = initialBoard[0][i]
+            if (piece.toLowerCase() == 'p') {
+                initialBoard = await promote(initialBoard, { dataset: { row: 0, col: i } });
+                console.log('finished promotion');
+            }
+        }
+    }
+    if (initialBoard[7].toLowerCase().includes('p')) {
+        for (let i = 0; i < 8; i++) {
+            const piece = initialBoard[7][i]
+            if (piece.toLowerCase() == 'p') {
+                initialBoard = await promote(initialBoard, { dataset: { row: 7, col: i } });
+                console.log('finished promotion');
+            }
+        }
+    }
     if (!initialBoard.join('').includes('j')) {
         blackJoeOldSquare = null;
         blackJoeSquare = null;
@@ -681,3 +740,4 @@ function updateBoard() {
 
 createBoard();
 placePieces();
+updateBoard();

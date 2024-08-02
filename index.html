@@ -23,7 +23,7 @@
         body.check {
             background-color: #ffe3c7;
         }
-        button {
+        .control {
             border: 0;
             background-color: #00000010;
             color: #111111;
@@ -37,7 +37,26 @@
             margin: 2vmin;
             padding: 1vh 2vh;
         }
-        button:hover {
+        .control:hover {
+            background-color: #00000020;
+        }
+        .promotionButton {
+            border: 0;
+            background-color: #00000010;
+            color: #111111;
+            font-size: 100%;
+            border-radius: 8px;
+            transition: 0.6s;
+            cursor: pointer;
+            position: relative;
+            z-index: 3;
+            font-weight: bold;
+            margin: 1vmin;
+            padding: 0.6vmin;
+            max-width: 18vmin;
+            max-height: 18vmin;
+        }
+        .promotionButton:hover {
             background-color: #00000020;
         }
         p {
@@ -48,18 +67,22 @@
             p {
                 font-size: 18px;
             }
-            button {
+            .control {
                 width: 90px;
+            }
+            .promotion {
+                width: 360px;
+                height: 240px;
             }
         }
         @media screen and (max-width: 480px) {
-            button {
+            .control {
                 margin: 2vmin 1.4vmin;
                 padding: 0.6vh 1.2vh;
             }
         }
         @media screen and (max-width: 350px) {
-            button {
+            .control {
                 margin: 4vmin 1vmin;
                 padding: 0.4vh 0.8vh;
             }
@@ -143,16 +166,28 @@
         .invisible {
             display: none;
         }
+        .promotion {
+            display: grid;
+            position: absolute;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            z-index: 4;
+            border: 2px solid gray;
+            border-radius: 10px;
+            grid-template-rows: 50% 50%;
+            grid-template-columns: 33% 34% 33%;
+            transform: translateY(-12%);
+        }
     </style>
 </head>
 <body>
     <div id="chessboard"></div>
     <div id="options">
-        <button onclick="toggleTheme();">Theme</button>
-        <button onclick="flipBoard();">Flip</button>
-        <button onclick="toggleMute();" id="mute">Mute</button>
-        <button onclick="location.reload();">Restart</button>
-        <button onclick="viewBoard();" id="viewButton" class="invisible">View</button>
+        <button class="control" onclick="toggleTheme();">Theme</button>
+        <button class="control" onclick="flipBoard();">Flip</button>
+        <button class="control" onclick="toggleMute();" id="mute">Mute</button>
+        <button class="control" onclick="location.reload();">Restart</button>
+        <button class="control" onclick="viewBoard();" id="viewButton" class="invisible">View</button>
     </div>
     <div class="blur" id="blurScreen"></div>
     <script src="chess.js"></script>
