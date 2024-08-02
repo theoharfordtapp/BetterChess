@@ -487,7 +487,8 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     const col = newSquare.dataset.col;
     
     // Handle en passant capture
-    if (real && piece.toLowerCase() === 'p' || piece.toLowerCase() === 'e' && col !== oldCol && newBoard[row][col] === ' ') {
+    if (real && (piece.toLowerCase() === 'e' || piece.toLowerCase() === 'p') && col !== oldCol && newBoard[row][col] === ' ') {
+        console.log('en passant');
         newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
         newBoard[oldRow] = newBoard[oldRow].substring(0, col) + ' ' + newBoard[oldRow].substring(parseInt(col) + 1); // Remove the captured pawn
     } else {
