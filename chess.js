@@ -46,8 +46,10 @@ let whiteJoeOldSquare = null;
 let whiteJoeSquare = null;
 
 let currentTurn = null;
+
 let check = false;
 let checkmate = false;
+let stalemate = false;
 
 let enPassantTargetSquare = null;
 
@@ -199,7 +201,7 @@ function hasAnyMoves(boardState, square) {
 function inCheckmate(boardState) {
     let blackInCheckmate = true;
     let whiteInCheckmate = true;
-    rowloop: for (let row = 0; row < 8; row++) {
+    for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
             if (hasAnyMoves(boardState, { dataset: { row: row, col: col } })) {
                 if (boardState[row][col] == boardState[row][col].toLowerCase()) {
@@ -493,6 +495,8 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
             } else {
                 sound = new Audio('assets/audio/check.wav');
             }
+        } else if (inCheckmate(newBoard)) {
+            sound = new Audio('assets/audio/stalemate.wav');
         } else if (newBoard.join('').replace(/\s/g, '').length !== boardToUpdate.join('').replace(/\s/g, '').length) {
             sound = new Audio('assets/audio/capture.wav');
         } else {
@@ -581,6 +585,9 @@ function updateBoard() {
             check = true;
             document.body.classList.add('check');
         }
+    } else if (inCheckmate(initialBoard)) {
+        stalemate = true;
+        document.body.classList.add('check');
     } else {
         check = false;
         document.body.classList.remove('check');
@@ -640,18 +647,20 @@ function updateBoard() {
             }
         }
     }
-    if (checkmate) {
-        let winner = '';
+    if (checkmate || stalemate) {
+        let winningText = '';
         if (inCheck(initialBoard) == 'white') {
-            winner = 'Black';
+            winningText = 'Black wins';
+        } else if (inCheck(initialBoard) == 'black') {
+            winningText = 'White wins';
         } else {
-            winner = 'White';
+            winningText = 'Stalemate'
         }
         
         const blurScreen = document.getElementById('blurScreen');
 
         blurScreen.classList.add('visible')
-        blurScreen.innerHTML = `${winner} wins!`;
+        blurScreen.innerHTML = winningText;
 
         const viewButton = document.getElementById('viewButton');
 
