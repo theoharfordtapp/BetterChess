@@ -20,14 +20,16 @@ const piecesLocal = {
     'J': 'wj.png',
     'e': 'be.png',
     'E': 'we.png',
+    'd': 'bd.png',
+    'D': 'wd.png',
 }
 
 let initialBoard = [
     'rnbqkbno',
     'eeppppee',
     '        ',
-    '        ',
-    '        ',
+    '   dD   ',
+    '   Dd   ',
     '        ',
     'EEPPPPEE',
     'RNBQKBNO'
@@ -328,7 +330,7 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
     const destinationIsWhite = destinationPiece === destinationPiece.toUpperCase();
 
     // If destination is occupied by the same colour, return false
-    if (destinationPiece !== ' ' && isWhite === destinationIsWhite) {
+    if (destinationPiece !== ' ' && isWhite === destinationIsWhite && destinationPiece.toLowerCase() !== 'd') {
         return false;
     }
 
@@ -384,6 +386,14 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
             return true;
         }
 
+        return false;
+    }
+
+    if (pieceType === 'd') {
+        if (Math.abs(newCol - oldCol) <= 1 && Math.abs(newRow - oldRow) <= 1 && boardState[newRow][newCol] === ' ') {
+            return true;
+        }
+        
         return false;
     }
 
@@ -525,12 +535,11 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     const row = newSquare.dataset.row;
     const col = newSquare.dataset.col;
     
-    // Handle en passant capture
     if (real && (piece.toLowerCase() === 'e' || piece.toLowerCase() === 'p') && col !== oldCol && newBoard[row][col] === ' ') {
         console.log('en passant');
         newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
         newBoard[oldRow] = newBoard[oldRow].substring(0, col) + ' ' + newBoard[oldRow].substring(parseInt(col) + 1); // Remove the captured pawn
-    } else {
+    } else if (piece.toLowerCase() !== 'd') {
         newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
     }
     
@@ -549,8 +558,10 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
             }
         } else if (inCheckmate(newBoard)) {
             sound = new Audio('assets/audio/stalemate.wav');
-        } else if (newBoard.join('').replace(/\s/g, '').length !== boardToUpdate.join('').replace(/\s/g, '').length) {
+        } else if (newBoard.join('').replace(/\s/g, '').length < boardToUpdate.join('').replace(/\s/g, '').length) {
             sound = new Audio('assets/audio/capture.wav');
+        } else if (piece.toLowerCase() === 'd') {
+            sound = new Audio('assets/audio/duplicate.wav')
         } else {
             sound = new Audio('assets/audio/move.wav')
         }
@@ -607,12 +618,12 @@ async function updateBoard() {
         let bidenSound = null
         if (!bidensStarted) {
             ['j', 'J'].forEach(piece => {
-                let row = Math.ceil(Math.random() * 7);
-                let col = Math.ceil(Math.random() * 7);
+                let row = Math.round(Math.random() * 7);
+                let col = Math.round(Math.random() * 7);
                 
                 while (initialBoard[row][col] == 'k' || initialBoard[row][col] == 'K' || initialBoard[row][col] == 'j' || initialBoard[row][col] == 'J') {
-                    row = Math.ceil(Math.random() * 7);
-                    col = Math.ceil(Math.random() * 7);
+                    row = Math.round(Math.random() * 7);
+                    col = Math.round(Math.random() * 7);
                 }
                 
                 if (piece == 'j') { blackJoeSquare = { dataset: { row: row, col: col } } }
@@ -624,12 +635,12 @@ async function updateBoard() {
             bidensStarted = true;
         } else {
             if (initialBoard.join('').includes('j')) {
-                let row = Math.ceil(Math.random() * 7);
-                let col = Math.ceil(Math.random() * 7);
+                let row = Math.round(Math.random() * 7);
+                let col = Math.round(Math.random() * 7);
                 
                 while (initialBoard[row][col] == 'k' || initialBoard[row][col] == 'K') {
-                    row = Math.ceil(Math.random() * 7);
-                    col = Math.ceil(Math.random() * 7);
+                    row = Math.round(Math.random() * 7);
+                    col = Math.round(Math.random() * 7);
                 }
 
                 for (let r = 0; r < 8; r++) {
@@ -644,12 +655,12 @@ async function updateBoard() {
                 bidenSound = new Audio('assets/audio/joebiden.wav');
             }
             if (initialBoard.join('').includes('J')) {
-                let row = Math.ceil(Math.random() * 7);
-                let col = Math.ceil(Math.random() * 7);
+                let row = Math.round(Math.random() * 7);
+                let col = Math.round(Math.random() * 7);
                 
-                while (initialBoard[row][col] == 'k' || initialBoard[row][col] == 'J') {
-                    row = Math.ceil(Math.random() * 7);
-                    col = Math.ceil(Math.random() * 7);
+                while (initialBoard[row][col] == 'k' || initialBoard[row][col] == 'K') {
+                    row = Math.round(Math.random() * 7);
+                    col = Math.round(Math.random() * 7);
                 }
                 
                 for (let r = 0; r < 8; r++) {
