@@ -523,7 +523,7 @@ function promote(boardState, square) {
         const promotionWindow = document.createElement('div');
         promotionWindow.classList.add('promotion');
 
-        ['q', 'o', 'r', 'b', 'n', 'e'].forEach(option => {
+        ['q', 'o', 'r', 'b', 'n', 'e', 'j', 'a', 'd'].forEach(option => {
             const piece = isWhite ? option.toUpperCase() : option;
 
             const optionButton = document.createElement('button');
@@ -570,7 +570,7 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     const row = newSquare.dataset.row;
     const col = newSquare.dataset.col;
     
-    if (real && (piece.toLowerCase() === 'e' || piece.toLowerCase() === 'p') && col !== oldCol && newBoard[row][col] === ' ') {
+    if ((piece.toLowerCase() === 'e' || piece.toLowerCase() === 'p') && col !== oldCol && newBoard[row][col] === ' ') {
         console.log('en passant');
         newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
         newBoard[oldRow] = newBoard[oldRow].substring(0, col) + ' ' + newBoard[oldRow].substring(parseInt(col) + 1); // Remove the captured pawn
