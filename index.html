@@ -164,7 +164,7 @@
             z-index: 2;
         }
         .invisible {
-            display: none;
+            display: none !important;
         }
         .promotion {
             display: grid;
@@ -178,6 +178,43 @@
             grid-template-columns: 33% 34% 33%;
             transform: translateY(-12%);
         }
+        .rules {
+            display: flex;
+            position: absolute;
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            z-index: 4;
+            border: 2px solid gray;
+            border-radius: 10px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transform: translateY(-12%);
+            padding: 2%;
+            max-width: 64%;
+            font-size: 1rem;
+        }
+        button.close {
+            border: 0;
+            background-color: #00000010;
+            color: #111111;
+            font-size: 100%;
+            border-radius: 40%;
+            transition: 0.6s;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 3;
+            font-weight: bold;
+            margin: 2vmin;
+            padding: 0.6vmin 1vmin;
+            font-size: 1rem;
+        }
+        button.close:hover {
+            background-color: #00000020;
+        }
     </style>
 </head>
 <body>
@@ -187,9 +224,28 @@
         <button class="control" onclick="flipBoard();">Flip</button>
         <button class="control" onclick="toggleMute();" id="mute">Mute</button>
         <button class="control" onclick="location.reload();">Restart</button>
+        <button class="control" onclick="toggleRules();" id="rulesButton">Rules</button>
         <button class="control invisible" onclick="viewBoard();" id="viewButton">View</button>
     </div>
     <div class="blur" id="blurScreen"></div>
+    <div class="rules invisible" id="rulesWindow">
+        <button class="close" onclick="toggleRules();">×</button>
+        <p>
+            Knook: Can move like a knight and rook combined.
+            <br>
+            <br>
+            Biden: Appears on the fifth move. Randomly moves every five turns after that. Cannot be moved manually.
+            <br>
+            <br>
+            En Passant: Moves like a pawn. Can capture any piece by en passant in any position. Can only move one space forward.
+            <br>
+            <br>
+            Duplicator: Copies itself when it moves. Can copy to any adjacent square. Can be captured by friendly (same colour) pieces. Cannot capture other pieces.
+            <br>
+            <br>
+            Airplane: Moves like a queen. Can fly over other pieces. Can only capture rooks. Once it captures a rook, it leaves behind an explosion. This explosion can be taken by friendly pieces and cannot move.
+        </p>
+    </div>
     <script src="chess.js"></script>
 </body>
 </html>

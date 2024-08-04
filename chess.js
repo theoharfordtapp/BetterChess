@@ -70,6 +70,8 @@ let firstMove = true;
 
 let bidensStarted = false;
 
+let rulesShown = false;
+
 function createBoard() {
     const board = document.getElementById('chessboard');
     let isWhite = true;
@@ -551,6 +553,15 @@ function promote(boardState, square) {
     })
 }
 
+function toggleRules() {
+    const rulesWindow = document.getElementById('rulesWindow');
+
+    if (rulesShown) { rulesWindow.classList.add('invisible'); }
+    else { rulesWindow.classList.remove('invisible'); }
+
+    rulesShown = !rulesShown
+}
+
 function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     const newBoard = structuredClone(boardToUpdate);
     
@@ -799,7 +810,9 @@ async function updateBoard() {
         blurScreen.innerHTML = winningText;
 
         const viewButton = document.getElementById('viewButton');
+        const rulesButton = document.getElementById('rulesButton');
 
+        rulesButton.classList.add('invisible');
         viewButton.classList.remove('invisible');
     }
 }
