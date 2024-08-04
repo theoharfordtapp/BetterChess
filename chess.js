@@ -22,17 +22,21 @@ const piecesLocal = {
     'E': 'we.png',
     'd': 'bd.png',
     'D': 'wd.png',
+    'a': 'ba.png',
+    'A': 'wa.png',
+    'x': 'bx.png',
+    'X': 'wx.png',
 }
 
 let initialBoard = [
-    'rnbqkbno',
+    'rabqkbno',
     'eeppppee',
-    '        ',
+    '  a  a  ',
     '   dD   ',
     '   Dd   ',
-    '        ',
+    '  A  A  ',
     'EEPPPPEE',
-    'RNBQKBNO'
+    'RABQKBNO'
 ];
 
 let selectedPiece = null;
@@ -84,27 +88,6 @@ function createBoard() {
     }
 }
 
-function placePieces() {
-    const board = document.getElementById('chessboard').children;
-    for (let row = 0; row < 8; row++) {
-        for (let col = 0; col < 8; col++) {
-            const piece = initialBoard[row][col];
-            if (piece !== ' ') {
-                const img = document.createElement('img');
-                if (piece in pieces) { img.src = `https://images.chesscomfiles.com/chess-themes/pieces/${theme}/150/${pieces[piece]}`; }
-                else { img.src = `assets/${theme}/${piecesLocal[piece]}`; }
-                img.className = 'piece';
-                board[row * 8 + col].appendChild(img);
-                if (piece == 'j') {
-                    blackJoeSquare = { dataset: { row: row, col: col } };
-                } else if (piece == 'J') {
-                    whiteJoeSquare = { dataset: { row: row, col: col } };
-                }
-            }
-        }
-    }
-}
-
 function toggleTheme() {
     theme = (theme == 'neo') ? 'classic' : 'neo';
 
@@ -138,9 +121,40 @@ function flipBoard() {
         const newSquare = { dataset: { row: 7 - enPassantTargetSquare.dataset.row, col: 7 - enPassantTargetSquare.dataset.col } };
         enPassantTargetSquare = newSquare;
     }
-
+    
     if (selectedOldSquare) {
-        selectedOldSquare = null;
+        const newSquare = { dataset: { row: 7 - selectedOldSquare.dataset.row, col: 7 - selectedOldSquare.dataset.col } };
+        selectedOldSquare = newSquare;
+    }
+
+    if (lastSelectedOldSquare) {
+        const newSquare = { dataset: { row: 7 - lastSelectedOldSquare.dataset.row, col: 7 - lastSelectedOldSquare.dataset.col } };
+        lastSelectedOldSquare = newSquare;
+    }
+
+    if (lastSelectedSquare) {
+        const newSquare = { dataset: { row: 7 - lastSelectedSquare.dataset.row, col: 7 - lastSelectedSquare.dataset.col } };
+        lastSelectedSquare = newSquare;
+    }
+    
+    if (blackJoeOldSquare) {
+        const newSquare = { dataset: { row: 7 - blackJoeOldSquare.dataset.row, col: 7 - blackJoeOldSquare.dataset.col } };
+        blackJoeOldSquare = newSquare;
+    }
+    
+    if (blackJoeSquare) {
+        const newSquare = { dataset: { row: 7 - blackJoeSquare.dataset.row, col: 7 - blackJoeSquare.dataset.col } };
+        blackJoeSquare = newSquare;
+    }
+
+    if (whiteJoeOldSquare) {
+        const newSquare = { dataset: { row: 7 - whiteJoeOldSquare.dataset.row, col: 7 - whiteJoeOldSquare.dataset.col } };
+        whiteJoeOldSquare = newSquare;
+    }
+    
+    if (whiteJoeSquare) {
+        const newSquare = { dataset: { row: 7 - whiteJoeSquare.dataset.row, col: 7 - whiteJoeSquare.dataset.col } };
+        whiteJoeSquare = newSquare;
     }
     
     flipped = !flipped;
@@ -330,11 +344,11 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
     const destinationIsWhite = destinationPiece === destinationPiece.toUpperCase();
 
     // If destination is occupied by the same colour, return false
-    if (destinationPiece !== ' ' && isWhite === destinationIsWhite && destinationPiece.toLowerCase() !== 'd') {
+    if (destinationPiece !== ' ' && isWhite === destinationIsWhite && destinationPiece.toLowerCase() !== 'd' && destinationPiece.toLowerCase() !== 'x') {
         return false;
     }
 
-    if (!testingCheck && (boardState[newRow][newCol] == 'K' || boardState[newRow][newCol] == 'k')) {
+    if (!testingCheck && boardState[newRow][newCol].toLowerCase() == 'k' && !inCheck(boardState)) {
         return false;
     }
     
@@ -382,7 +396,7 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
             }
         }
         // En passant
-        else if (Math.abs(newCol - oldCol) === 1 && newRow === oldRow + direction && boardState[oldRow][newCol] !== ' ' && boardState[newRow][newCol] === ' ' && (boardState[oldRow][newCol].toUpperCase() == boardState[oldRow][newCol]) !== isWhite) {
+        else if (Math.abs(newCol - oldCol) === 1 && newRow === oldRow + direction && boardState[oldRow][newCol] !== ' ' && boardState[newRow][newCol] === ' ' && ((boardState[oldRow][newCol].toUpperCase() == boardState[oldRow][newCol]) !== isWhite || boardState[oldRow][newCol].toLowerCase() === 'd' || boardState[oldRow][newCol].toLowerCase() === 'x')) {
             return true;
         }
 
@@ -416,7 +430,7 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
     if (pieceType === 'o') {
         const rowDiff = Math.abs(newRow - oldRow);
         const colDiff = Math.abs(newCol - oldCol);
-    
+        
         // Rook-like move
         if (newRow === oldRow || newCol === oldCol) {
             return isPathClear(oldRow, oldCol, newRow, newCol);
@@ -429,8 +443,8 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
         
         return false;
     }
-
-
+    
+    
     // Bishop moves
     if (pieceType === 'b') {
         if (Math.abs(newRow - oldRow) === Math.abs(newCol - oldCol)) {
@@ -438,11 +452,21 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
         }
         return false;
     }
-
+    
     // Queen moves
     if (pieceType === 'q') {
         if (newRow === oldRow || newCol === oldCol || Math.abs(newRow - oldRow) === Math.abs(newCol - oldCol)) {
             return isPathClear(oldRow, oldCol, newRow, newCol);
+        }
+        return false;
+    }
+    
+    if (pieceType === 'a') {
+        const rowDiff = Math.abs(newRow - oldRow);
+        const colDiff = Math.abs(newCol - oldCol);
+
+        if ((rowDiff === colDiff || colDiff === 0 || rowDiff === 0) && (destinationPiece.toLowerCase() === 'r' || destinationPiece === ' ')) {
+            return true;
         }
         return false;
     }
@@ -542,8 +566,12 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     } else if (piece.toLowerCase() !== 'd') {
         newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
     }
-    
-    newBoard[row] = newBoard[row].substring(0, col) + piece + newBoard[row].substring(parseInt(col) + 1);
+
+    if (piece.toLowerCase() === 'a' && boardToUpdate[row][col] !== ' ') {
+        newBoard[row] = newBoard[row].substring(0, col) + ((piece.toLowerCase() === piece) ? 'X' : 'x') + newBoard[row].substring(parseInt(col) + 1);
+    } else {
+        newBoard[row] = newBoard[row].substring(0, col) + piece + newBoard[row].substring(parseInt(col) + 1);
+    }
     
     if (real && !mute) {
         let sound = null
@@ -558,6 +586,8 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
             }
         } else if (inCheckmate(newBoard)) {
             sound = new Audio('assets/audio/stalemate.wav');
+        } else if (piece.toLowerCase() === 'a' && boardToUpdate[row][col] !== ' ') {
+            sound = new Audio('assets/audio/explode.wav');
         } else if (newBoard.join('').replace(/\s/g, '').length < boardToUpdate.join('').replace(/\s/g, '').length) {
             sound = new Audio('assets/audio/capture.wav');
         } else if (piece.toLowerCase() === 'd') {
@@ -707,15 +737,19 @@ async function updateBoard() {
             img.className = 'piece';
             square.appendChild(img);
         }
-        if (square == selectedOldSquare) {
-            square.classList.add('yellow');
-        } else {
-            square.classList.remove('yellow');
+        if (selectedOldSquare) {
+            if (square.dataset.row == selectedOldSquare.dataset.row && square.dataset.col == selectedOldSquare.dataset.col) {
+                square.classList.add('yellow');
+            } else {
+                square.classList.remove('yellow');
+            }
         }
-        if (square == lastSelectedOldSquare || square == lastSelectedSquare) {
-            square.classList.add('green');
-        } else {
-            square.classList.remove('green');
+        if (lastSelectedOldSquare && lastSelectedSquare) {
+            if ((square.dataset.row == lastSelectedOldSquare.dataset.row && square.dataset.col == lastSelectedOldSquare.dataset.col) || (square.dataset.row == lastSelectedSquare.dataset.row && square.dataset.col == lastSelectedSquare.dataset.col)) {
+                square.classList.add('green');
+            } else {
+                square.classList.remove('green');
+            }
         }
         if (blackJoeSquare) {
             if (square.dataset.row == blackJoeSquare.dataset.row && square.dataset.col == blackJoeSquare.dataset.col) {
@@ -771,5 +805,4 @@ async function updateBoard() {
 }
 
 createBoard();
-placePieces();
 updateBoard();
