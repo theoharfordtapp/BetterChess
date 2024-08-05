@@ -26,14 +26,18 @@ const piecesLocal = {
     'A': 'wa.png',
     'x': 'bx.png',
     'X': 'wx.png',
+    'c': 'tlc.png',
+    'C': 'trc.png',
+    'h': 'blc.png',
+    'H': 'brc.png',
 }
 
 let initialBoard = [
     'rabqkbno',
     'eeppppee',
     '  a  a  ',
-    '   dD   ',
-    '   Dd   ',
+    'cC dD   ',
+    'hH Dd   ',
     '  A  A  ',
     'EEPPPPEE',
     'RABQKBNO'
@@ -346,7 +350,7 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
     const destinationIsWhite = destinationPiece === destinationPiece.toUpperCase();
 
     // If destination is occupied by the same colour, return false
-    if (destinationPiece !== ' ' && isWhite === destinationIsWhite && destinationPiece.toLowerCase() !== 'd' && destinationPiece.toLowerCase() !== 'x') {
+    if (destinationPiece !== ' ' && isWhite === destinationIsWhite && destinationPiece.toLowerCase() !== 'd' && destinationPiece.toLowerCase() !== 'x' && destinationPiece.toLowerCase() !== 'c' && destinationPiece.toLowerCase() !== 'h') {
         return false;
     }
 
@@ -570,10 +574,19 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     const row = newSquare.dataset.row;
     const col = newSquare.dataset.col;
     
-    if ((piece.toLowerCase() === 'e' || piece.toLowerCase() === 'p') && col !== oldCol && newBoard[row][col] === ' ') {
+    if ((piece.toLowerCase() === 'e' || piece.toLowerCase() === 'p') && col !== oldCol && boardToUpdate[row][col] === ' ') {
         console.log('en passant');
         newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
         newBoard[oldRow] = newBoard[oldRow].substring(0, col) + ' ' + newBoard[oldRow].substring(parseInt(col) + 1); // Remove the captured pawn
+    } else if (boardToUpdate[row][col].toLowerCase() === 'c' || boardToUpdate[row][col].toLowerCase() === 'h') {
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                if (boardToUpdate[r][c].toLowerCase() === 'c' || boardToUpdate[r][c].toLowerCase() === 'h') {
+                    newBoard[r] = newBoard[r].substring(0, c) + ' ' + newBoard[r].substring(parseInt(c) + 1);
+                }
+            }
+        }
+        newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
     } else if (piece.toLowerCase() !== 'd') {
         newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
     }
