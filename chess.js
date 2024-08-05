@@ -33,14 +33,14 @@ const piecesLocal = {
 }
 
 let initialBoard = [
-    'rabqkbno',
+    'rnbqkbno',
     'eeppppee',
     '  a  a  ',
     'cC dD   ',
     'hH Dd   ',
     '  A  A  ',
     'EEPPPPEE',
-    'RABQKBNO'
+    'RNBQKBNO'
 ];
 
 let selectedPiece = null;
