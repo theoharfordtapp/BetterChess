@@ -140,6 +140,9 @@
         .piece {
             width: 100%;
             height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
         .blur {
             opacity: 0;
@@ -247,6 +250,9 @@
             <br>
             <br>
             Chick-fil-A Sauce: Does nothing.
+            <br>
+            <br>
+            Train: Appears every five moves, waits for two moves, and then leaves again. A piece may board the train by moving on top of it. When the train leaves, any boarded pieces will leave with it. The next time it arrives, those pieces will come back on the opposite train. Bishops do not return. Any pieces on the train's path will be captured when it arrives. If both kings are on the trains, stalemate occurs. If a king is on a train's path when it arrives, checkmate occurs. A king may not move onto a train's path one move before it arrives.
         </p>
     </div>
     <script src="chess.js"></script>
