@@ -244,7 +244,7 @@ function hasAnyMoves(boardState, square) {
     const piece = boardState[square.dataset.row][square.dataset.col];
     for (let row = 0; row < colLength; row++) {
         for (let col = 0; col < rowLength; col++) {
-            if (checkValidMove(boardState, false, piece, square, { dataset: { row: row, col: col } })) {
+            if (checkValidMove(boardState, piece, square, { dataset: { row: row, col: col } })) {
                 return true;
             }
         }
@@ -290,21 +290,106 @@ function findKing(boardState, isWhite) {
 function inCheck(boardState) {
     // Helper function to determine if a position is under attack by any opponent piece
     function isUnderAttack(row, col, isWhite) {
-        for (let r = 0; r < colLength; r++) {
-            for (let c = 0; c < rowLength; c++) {
-                const piece = boardState[r][c];
-                if (piece !== ' ' && (piece === piece.toUpperCase()) !== isWhite) {
-                    if (checkValidMove(boardState, true, piece, { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } })) {
-                        return true;
-                    } else if (piece.toLowerCase() == 'e' && (piece === piece.toUpperCase()) !== isWhite) {
-                        const direction = isWhite ? -1 : 1;
-                        if (checkValidMove(boardState, true, piece, { dataset: { row: r, col: c } }, { dataset: { row: row-(direction), col: col } })) {
+        // Define movement directions for rooks, bishops, and queens
+        const directions = [
+            [1, 0], [-1, 0], [0, 1], [0, -1],  // Rook and Knook (vertical and horizontal)
+            [1, 1], [-1, -1], [1, -1], [-1, 1] // Bishop
+        ];
+
+        // Rook, Bishop, Queen, and Knook moves
+        for (let [dr, dc] of directions) {
+            let r = row + dr;
+            let c = col + dc;
+            while (r >= 0 && r < colLength && c >= 0 && c < rowLength) {
+                if (boardState[r][c] !== ' ') {
+                    const piece = boardState[r][c];
+                    const pieceIsWhite = piece === piece.toUpperCase();
+                    const pieceType = piece.toLowerCase();
+                    if (pieceIsWhite !== isWhite) {
+                        if ((pieceType === 'q') ||
+                            (pieceType === 'r' && (dr === 0 || dc === 0)) ||
+                            (pieceType === 'b' && (dr !== 0 && dc !== 0)) ||
+                            (pieceType === 'o' && (dr === 0 || dc === 0))) {
                             return true;
+                        }
+                    }
+                    break;
+                }
+                r += dr;
+                c += dc;
+            }
+        }
+
+        // Knight and Knook moves
+        const knightMoves = [
+            [2, 1], [2, -1], [-2, 1], [-2, -1],
+            [1, 2], [1, -2], [-1, 2], [-1, -2]
+        ];
+
+        for (let [dr, dc] of knightMoves) {
+            const r = row + dr;
+            const c = col + dc;
+            if (r >= 0 && r < colLength && c >= 0 && c < rowLength) {
+                const piece = boardState[r][c];
+                if (piece !== ' ') {
+                    const pieceIsWhite = piece === piece.toUpperCase();
+                    if (pieceIsWhite !== isWhite && (piece.toLowerCase() === 'n' || piece.toLowerCase() === 'o')) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // King moves
+        for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+                if (dr !== 0 || dc !== 0) {
+                    const r = row + dr;
+                    const c = col + dc;
+                    if (r >= 0 && r < colLength && c >= 0 && c < rowLength) {
+                        const piece = boardState[r][c];
+                        if (piece !== ' ') {
+                            const pieceIsWhite = piece === piece.toUpperCase();
+                            if (pieceIsWhite !== isWhite && piece.toLowerCase() === 'k') {
+                                return true;
+                            }
                         }
                     }
                 }
             }
         }
+
+        // Pawn moves
+        const direction = isWhite ? -1 : 1;
+        for (let dc of [-1, 1]) {
+            const r = row + direction;
+            const c = col + dc;
+            if (r >= 0 && r < colLength && c >= 0 && c < rowLength) {
+                const piece = boardState[r][c];
+                if (piece !== ' ') {
+                    const pieceIsWhite = piece === piece.toUpperCase();
+                    if (pieceIsWhite !== isWhite && piece.toLowerCase() === 'p') {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // En Passant moves
+        [-1, 1].forEach(colMove => {
+            const r = row;
+            const c = col + colMove;
+            if (r >= 0 && r < colLength && c >= 0 && c < rowLength) {
+                const piece = boardState[r][c];
+                if (piece !== ' ') {
+                    const pieceIsWhite = piece === piece.toUpperCase();
+                    if (pieceIsWhite !== isWhite && piece.toLowerCase() === 'e') {
+                        return true;
+                    }
+                }
+            }
+        });
+
         return false;
     }
 
@@ -312,19 +397,16 @@ function inCheck(boardState) {
     const whiteKingPos = findKing(boardState, true);
     const blackKingPos = findKing(boardState, false);
 
-    let whiteKingInCheck = null;
-    let blackKingInCheck = null;
-    
-    if (whiteKingPos !== null && blackKingPos !== null) {
-        whiteKingInCheck = isUnderAttack(whiteKingPos.dataset.row, whiteKingPos.dataset.col, true);
-        blackKingInCheck = isUnderAttack(blackKingPos.dataset.row, blackKingPos.dataset.col, false);
-    } else if (whiteKingPos === null && blackKingPos !== null) {
-        // console.log("White king not found on the board!");
-        blackKingInCheck = isUnderAttack(blackKingPos.dataset.row, blackKingPos.dataset.col, false);
-    } else if (blackKingPos === null && whiteKingPos !== null) {
-        // console.log("Black king not found on the board!");
-        whiteKingInCheck = isUnderAttack(whiteKingPos.dataset.row, whiteKingPos.dataset.col, true);
+    let whiteKingInCheck = false;
+    let blackKingInCheck = false;
+
+    if (whiteKingPos) {
+        whiteKingInCheck = isUnderAttack(parseInt(whiteKingPos.dataset.row), parseInt(whiteKingPos.dataset.col), true);
     }
+    if (blackKingPos) {
+        blackKingInCheck = isUnderAttack(parseInt(blackKingPos.dataset.row), parseInt(blackKingPos.dataset.col), false);
+    }
+
     if (whiteKingInCheck && blackKingInCheck) {
         return 'both'; // Both kings are in check (shouldn't typically happen in a normal game)
     } else if (whiteKingInCheck) {
@@ -337,7 +419,29 @@ function inCheck(boardState) {
 }
 
 
-function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
+function isPathClear(boardState, startRow, startCol, endRow, endCol) {
+    const rowDiff = endRow - startRow;
+    const colDiff = endCol - startCol;
+    const stepRow = rowDiff === 0 ? 0 : rowDiff / Math.abs(rowDiff);
+    const stepCol = colDiff === 0 ? 0 : colDiff / Math.abs(colDiff);
+
+    let row = startRow + stepRow;
+    let col = startCol + stepCol;
+
+    while (row !== endRow || col !== endCol) {
+        if (row < 0 || row > (colLength-1) || col < 0 || col > (rowLength-1)) {
+            return false; // Out of bounds
+        }
+        if (boardState[row][col] !== ' ') {
+            return false;
+        }
+        row += stepRow;
+        col += stepCol;
+    }
+    return true;
+}
+
+function checkValidMove(boardState, piece, oldSquare, newSquare) {
     const oldRow = parseInt(oldSquare.dataset.row);
     const oldCol = parseInt(oldSquare.dataset.col);
     const newRow = parseInt(newSquare.dataset.row);
@@ -346,32 +450,8 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
     const pieceType = piece.toLowerCase();
     const isWhite = (piece == piece.toUpperCase());
 
-    // Helper function to check if the path is clear for rooks, bishops, and queens
-    function isPathClear(startRow, startCol, endRow, endCol) {
-        const rowDiff = endRow - startRow;
-        const colDiff = endCol - startCol;
-        const stepRow = rowDiff === 0 ? 0 : rowDiff / Math.abs(rowDiff);
-        const stepCol = colDiff === 0 ? 0 : colDiff / Math.abs(colDiff);
-    
-        let row = startRow + stepRow;
-        let col = startCol + stepCol;
-    
-        while (row !== endRow || col !== endCol) {
-            if (row < 0 || row > (colLength-1) || col < 0 || col > (rowLength-1)) {
-                return false; // Out of bounds
-            }
-            if (boardState[row][col] !== ' ') {
-                return false;
-            }
-            row += stepRow;
-            col += stepCol;
-        }
-        return true;
-    }
-
-
     // Check if move is within bounds
-    if (newRow < 0 || newRow > (colLength-1) || newCol < 0 || newCol > (rowLength-1)) {
+    if (newRow < 0 || newRow > (colLength - 1) || newCol < 0 || newCol > (rowLength - 1)) {
         return false;
     }
 
@@ -384,21 +464,22 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
         return false;
     }
 
-    if ((newSquare.dataset.row === (colLength/2)-2 || newSquare.dataset.row === (colLength/2)+1) && piece.toLowerCase() === 'k' && movesUntilArrival === 1) {
+    if ((newSquare.dataset.row === (colLength / 2) - 2 || newSquare.dataset.row === (colLength / 2) + 1) && piece.toLowerCase() === 'k' && movesUntilArrival === 1) {
         return false;
     }
 
-    if (!testingCheck && boardState[newRow][newCol].toLowerCase() == 'k' && !inCheck(boardState)) {
+    if (boardState[newRow][newCol].toLowerCase() == 'k' && !inCheck(boardState)) {
         return false;
     }
-    
-    if (!testingCheck) {
-        throwawayBoard = structuredClone(boardState);
-        hypothetical = movePiece(false, throwawayBoard, piece, oldSquare, newSquare);
-        
-        if ((inCheck(hypothetical) == 'white' && isWhite) || (inCheck(hypothetical) == 'black' && !isWhite)) {
-            return false;
-        }
+
+    const throwawayBoard = structuredClone(boardState);
+    const hypothetical = movePiece(false, throwawayBoard, piece, oldSquare, newSquare);
+
+    // Check if the move leaves the current player's king in check
+    const checkStatusBeforeMove = inCheck(boardState);
+    const checkStatusAfterMove = inCheck(hypothetical);
+    if ((checkStatusAfterMove === 'white' && isWhite) || (checkStatusAfterMove === 'black' && !isWhite) || checkStatusAfterMove === 'both') {
+        return false;
     }
 
     // Pawn moves
@@ -410,7 +491,7 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
                 return true;
             }
             // Move two squares forward from the starting position
-            if (newRow === oldRow + 2 * direction && oldRow === (flipped ? (isWhite ? 1 : colLength-2) : (isWhite ? colLength-2 : 1)) && boardState[newRow - direction][newCol] === ' ' && boardState[newRow][newCol] === ' ') {
+            if (newRow === oldRow + 2 * direction && oldRow === (flipped ? (isWhite ? 1 : colLength - 2) : (isWhite ? colLength - 2 : 1)) && boardState[newRow - direction][newCol] === ' ' && boardState[newRow][newCol] === ' ') {
                 return true;
             }
         }
@@ -447,14 +528,14 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
         if (Math.abs(newCol - oldCol) <= 1 && Math.abs(newRow - oldRow) <= 1 && boardState[newRow][newCol] === ' ') {
             return true;
         }
-        
+
         return false;
     }
 
     // Rook moves
     if (pieceType === 'r') {
         if (newRow === oldRow || newCol === oldCol) {
-            return isPathClear(oldRow, oldCol, newRow, newCol);
+            return isPathClear(boardState, oldRow, oldCol, newRow, newCol);
         }
         return false;
     }
@@ -465,42 +546,41 @@ function checkValidMove(boardState, testingCheck, piece, oldSquare, newSquare) {
         const colDiff = Math.abs(newCol - oldCol);
         return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
     }
-    
+
     // Knook moves
     if (pieceType === 'o') {
         const rowDiff = Math.abs(newRow - oldRow);
         const colDiff = Math.abs(newCol - oldCol);
-        
+
         // Rook-like move
         if (newRow === oldRow || newCol === oldCol) {
-            return isPathClear(oldRow, oldCol, newRow, newCol);
+            return isPathClear(boardState, oldRow, oldCol, newRow, newCol);
         }
-        
+
         // Knight-like move
         if ((rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)) {
             return true;
         }
-        
+
         return false;
     }
-    
-    
+
     // Bishop moves
     if (pieceType === 'b') {
         if (Math.abs(newRow - oldRow) === Math.abs(newCol - oldCol)) {
-            return isPathClear(oldRow, oldCol, newRow, newCol);
+            return isPathClear(boardState, oldRow, oldCol, newRow, newCol);
         }
         return false;
     }
-    
+
     // Queen moves
     if (pieceType === 'q') {
         if (newRow === oldRow || newCol === oldCol || Math.abs(newRow - oldRow) === Math.abs(newCol - oldCol)) {
-            return isPathClear(oldRow, oldCol, newRow, newCol);
+            return isPathClear(boardState, oldRow, oldCol, newRow, newCol);
         }
         return false;
     }
-    
+
     if (pieceType === 'a') {
         const rowDiff = Math.abs(newRow - oldRow);
         const colDiff = Math.abs(newCol - oldCol);
@@ -528,7 +608,7 @@ function select(square, row, col) {
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
     if (selectedOldSquare !== null && selectedSquare == null) {
         console.log('Selecting square')
-        if (checkValidMove(initialBoard, false, selectedPiece, selectedOldSquare, square)) {
+        if (checkValidMove(initialBoard, selectedPiece, selectedOldSquare, square)) {
             console.log('Valid move')
 
             selectedSquare = square;
@@ -917,7 +997,7 @@ async function updateBoard() {
             square.classList.remove('blue');
         }
         if (selectedPiece !== null && selectedOldSquare !== null) {
-            if (checkValidMove(initialBoard, false, selectedPiece, selectedOldSquare, square)) {
+            if (checkValidMove(initialBoard, selectedPiece, selectedOldSquare, square)) {
                 const dot = document.createElement('div');
                 dot.classList.add('dot');
                 square.appendChild(dot);
