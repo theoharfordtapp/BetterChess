@@ -32,6 +32,24 @@ const piecesLocal = {
     'H': 'brc.png',
 }
 
+function flipSauce(saucePiece) {
+    if (flipped) {
+        switch (saucePiece) {
+            case 'tlc.png':
+                return 'brc.png'
+            case 'trc.png':
+                return 'blc.png'
+            case 'blc.png':
+                return 'trc.png'
+            case 'brc.png':
+                return 'tlc.png'
+        }
+    }
+    else {
+        return saucePiece;
+    }
+}
+
 let initialBoard = [
     'arnbqkbnoa',
     'eeppppppee',
@@ -953,8 +971,17 @@ async function updateBoard() {
         }
         if (piece !== ' ') {
             const img = document.createElement('img');
-            if (piece in pieces) { img.src = `https://images.chesscomfiles.com/chess-themes/pieces/${theme}/150/${pieces[piece]}`; }
-            else { img.src = `assets/${theme}/${piecesLocal[piece]}`; }
+            let pieceSrc;
+            if (piece in pieces) {
+                pieceSrc = pieces[piece];
+                img.src = `https://images.chesscomfiles.com/chess-themes/pieces/${theme}/150/${pieceSrc}`;
+            } else {
+                pieceSrc = piecesLocal[piece];
+                if (['c', 'h'].includes(piece.toLowerCase())) {
+                    pieceSrc = flipSauce(pieceSrc);
+                }
+                img.src = `assets/${theme}/${pieceSrc}`;
+            }
             img.className = 'piece';
             square.appendChild(img);
         }
