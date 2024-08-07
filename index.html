@@ -40,6 +40,24 @@
         .control:hover {
             background-color: #00000020;
         }
+        .gambleButton {
+            border: 0;
+            background-color: #00000010;
+            color: #111111;
+            font-size: 100%;
+            border-radius: 8px;
+            transition: 0.6s;
+            cursor: pointer;
+            position: absolute;
+            bottom: -3%;
+            z-index: 3;
+            font-weight: bold;
+            margin: 2vmin;
+            padding: 1vh 2vh;
+        }
+        .gambleButton:hover {
+            background-color: #00000020;
+        }
         .promotionButton {
             border: 0;
             background-color: #00000010;
@@ -51,6 +69,17 @@
             position: relative;
             z-index: 3;
             font-weight: bold;
+            margin: 1vmin;
+            padding: 0.6vmin;
+            max-width: 18vmin;
+            max-height: 18vmin;
+        }
+        .alot {
+            border: 0;
+            background-color: #00000010;
+            border-radius: 8px;
+            position: relative;
+            z-index: 3;
             margin: 1vmin;
             padding: 0.6vmin;
             max-width: 18vmin;
@@ -73,6 +102,14 @@
             .promotion {
                 width: 360px;
                 height: 360px;
+            }
+            .gambleWindow {
+                width: 360px;
+                height: 120px;
+            }
+            .gambleGrid {
+                width: 340px;
+                height: 112px;
             }
         }
         @media screen and (max-width: 480px) {
@@ -144,6 +181,10 @@
             top: 0;
             left: 0;
         }
+        .slotSymbol {
+            width: 100%;
+            height: 100%;
+        }
         .blur {
             opacity: 0;
             display: flex;
@@ -197,6 +238,31 @@
             padding: 2%;
             max-width: 64%;
             font-size: 1rem;
+        }
+        .gambleWindow {
+            display: flex;
+            position: absolute;
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            z-index: 4;
+            border: 2px solid gray;
+            border-radius: 10px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transform: translateY(-12%);
+            padding: 1%;
+            padding-top: 0;
+            padding-bottom: 4.4%;
+            max-width: 64%;
+            font-size: 1rem;
+        }
+        .gambleGrid {
+            display: grid;
+            position: absolute;
+            grid-template-columns: 33% 34% 33%;
+            grid-template-rows: 100%;
         }
         button.close {
             border: 0;
@@ -252,7 +318,10 @@
             Chick-fil-A Sauce: Does nothing.
             <br>
             <br>
-            Train: Appears every five moves, waits for two moves, and then leaves again. A piece may board the train by moving on top of it. When the train leaves, any boarded pieces will leave with it. The next time it arrives, those pieces will come back on the opposite train. Bishops do not return. Any pieces on the train's path will be captured when it arrives. If both kings are on the trains, stalemate occurs. If a king is on a train's path when it arrives, checkmate occurs. A king may not move onto a train's path one move before it arrives.
+            Train: Appears every five moves, waits for two moves, anxd then leaves again. A piece may board the train by moving on top of it. When the train leaves, any boarded pieces will leave with it. The next time it arrives, those pieces will come back on the opposite train. Bishops do not return. Any pieces on the train's path will be captured when it arrives. If both kings are on the trains, stalemate occurs. If a king is on a train's path when it arrives, checkmate occurs. A king may not move onto a train's path one move before it arrives.
+            <br>
+            <br>
+            Casino: Any piece except the airplane can enter the casino. They will be given 3 spins. If they win, the piece is now able to take any other piece by en passant. If the piece was a Google En Passant piece, it is now able to take any other piece like a regular pawn. If the piece loses the gamble, it is not able to take any pieces for 1 move. If an airplane hits the casino, it explodes.
         </p>
     </div>
     <script src="chess.js"></script>

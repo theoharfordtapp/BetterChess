@@ -63,6 +63,32 @@ let initialBoard = [
     'ARNBQKBNOA'
 ];
 
+let lastBoard = [
+    'arnbqkbnoa',
+    'eeppppppee',
+    '          ',
+    '          ',
+    'cC  dD    ',
+    'hH  Dd    ',
+    '          ',
+    '          ',
+    'EEPPPPPPEE',
+    'ARNBQKBNOA'
+];
+
+let gambleBoard = [
+    '          ',
+    '          ',
+    '          ',
+    '          ',
+    '          ',
+    '          ',
+    '          ',
+    '          ',
+    '          ',
+    '          ',
+];
+
 let whiteTrainPassengers = [
     ' ',
     ' '
@@ -91,6 +117,8 @@ let blackJoeOldSquare = null;
 let blackJoeSquare = null;
 let whiteJoeOldSquare = null;
 let whiteJoeSquare = null;
+
+let casinoCaptured = false;
 
 let currentTurn = null;
 
@@ -159,6 +187,7 @@ function toggleMute() {
 
 function flipBoard() {
     let newBoard = [];
+    let newGambleBoard = [];
 
     initialBoard.forEach(row => {
         const rowArray = row.split('');
@@ -167,9 +196,18 @@ function flipBoard() {
         newBoard.push(rowReversed);
     })
 
+    gambleBoard.forEach(row => {
+        const rowArray = row.split('');
+        const rowArrayReversed = rowArray.reverse();
+        const rowReversed = rowArrayReversed.join('');
+        newGambleBoard.push(rowReversed);
+    })
+
     newBoard = newBoard.reverse();
+    newGambleBoard = newGambleBoard.reverse();
 
     initialBoard = structuredClone(newBoard);
+    gambleBoard = structuredClone(newGambleBoard);
 
     if (enPassantTargetSquare) {
         const newSquare = { dataset: { row: (colLength-1) - enPassantTargetSquare.dataset.row, col: (rowLength-1) - enPassantTargetSquare.dataset.col } };
@@ -230,7 +268,8 @@ function onSquareClick(event) {
         const newRow = parseInt(selectedSquare.dataset.row);
         const newCol = parseInt(selectedSquare.dataset.col);
         
-        initialBoard = movePiece(true, initialBoard, selectedPiece, selectedOldSquare, selectedSquare);
+        lastBoard = initialBoard;
+        [gambleBoard, initialBoard] = movePiece(true, gambleBoard, initialBoard, selectedPiece, selectedOldSquare, selectedSquare);
         
         // Reset en passant tracking
         enPassantTargetSquare = null;
@@ -258,11 +297,11 @@ function onSquareClick(event) {
     updateBoard();
 }
 
-function hasAnyMoves(boardState, square) {
+function hasAnyMoves(gambleBoardState, boardState, square) {
     const piece = boardState[square.dataset.row][square.dataset.col];
     for (let row = 0; row < colLength; row++) {
         for (let col = 0; col < rowLength; col++) {
-            if (checkValidMove(boardState, piece, square, { dataset: { row: row, col: col } })) {
+            if (checkValidMove(gambleBoardState, boardState, piece, square, { dataset: { row: row, col: col } })) {
                 return true;
             }
         }
@@ -270,12 +309,12 @@ function hasAnyMoves(boardState, square) {
     return false;
 }
 
-function inCheckmate(boardState) {
+function inCheckmate(gambleBoardState, boardState) {
     let blackInCheckmate = true;
     let whiteInCheckmate = true;
     for (let row = 0; row < colLength; row++) {
         for (let col = 0; col < rowLength; col++) {
-            if (hasAnyMoves(boardState, { dataset: { row: row, col: col } })) {
+            if (hasAnyMoves(gambleBoardState, boardState, { dataset: { row: row, col: col } })) {
                 if (boardState[row][col] == boardState[row][col].toLowerCase()) {
                     blackInCheckmate = false;
                     if (whiteInCheckmate == false) { return false; }
@@ -459,7 +498,7 @@ function isPathClear(boardState, startRow, startCol, endRow, endCol) {
     return true;
 }
 
-function checkValidMove(boardState, piece, oldSquare, newSquare) {
+function checkValidMove(gambleBoardState, boardState, piece, oldSquare, newSquare) {
     const oldRow = parseInt(oldSquare.dataset.row);
     const oldCol = parseInt(oldSquare.dataset.col);
     const newRow = parseInt(newSquare.dataset.row);
@@ -482,6 +521,15 @@ function checkValidMove(boardState, piece, oldSquare, newSquare) {
         return false;
     }
 
+    if (gambleBoard[oldRow][oldCol] === 'l') {
+        if (destinationPiece !== ' ') {
+            return false;
+        }
+        if (piece === 'd') {
+            return false;
+        }
+    }
+
     if ((newSquare.dataset.row === (colLength / 2) - 2 || newSquare.dataset.row === (colLength / 2) + 1) && piece.toLowerCase() === 'k' && movesUntilArrival === 1) {
         return false;
     }
@@ -491,10 +539,10 @@ function checkValidMove(boardState, piece, oldSquare, newSquare) {
     }
 
     const throwawayBoard = structuredClone(boardState);
-    const hypothetical = movePiece(false, throwawayBoard, piece, oldSquare, newSquare);
+    const throwawayGambleBoard = structuredClone(gambleBoardState);
+    const [, hypothetical] = movePiece(false, throwawayGambleBoard, throwawayBoard, piece, oldSquare, newSquare);
 
     // Check if the move leaves the current player's king in check
-    const checkStatusBeforeMove = inCheck(boardState);
     const checkStatusAfterMove = inCheck(hypothetical);
     if ((checkStatusAfterMove === 'white' && isWhite) || (checkStatusAfterMove === 'black' && !isWhite) || checkStatusAfterMove === 'both') {
         return false;
@@ -539,6 +587,14 @@ function checkValidMove(boardState, piece, oldSquare, newSquare) {
             return true;
         }
 
+        else if (gambleBoard[oldRow][oldCol] === 'w') {
+            if (Math.abs(newCol - oldCol) === 1 && newRow === oldRow + direction) {
+                if (destinationPiece !== ' ') {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
@@ -555,6 +611,11 @@ function checkValidMove(boardState, piece, oldSquare, newSquare) {
         if (newRow === oldRow || newCol === oldCol) {
             return isPathClear(boardState, oldRow, oldCol, newRow, newCol);
         }
+        if (gambleBoard[oldRow][oldCol] === 'w') {
+            if (Math.abs(newCol - oldCol) === 1 && Math.abs(newRow-oldRow) === 1 && boardState[oldRow][newCol] !== ' ' && boardState[newRow][newCol] === ' ' && ((boardState[oldRow][newCol].toUpperCase() == boardState[oldRow][newCol]) !== isWhite || boardState[oldRow][newCol].toLowerCase() === 'd' || boardState[oldRow][newCol].toLowerCase() === 'x')) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -562,6 +623,13 @@ function checkValidMove(boardState, piece, oldSquare, newSquare) {
     if (pieceType === 'n') {
         const rowDiff = Math.abs(newRow - oldRow);
         const colDiff = Math.abs(newCol - oldCol);
+
+        if (gambleBoard[oldRow][oldCol] === 'w') {
+            if (Math.abs(newCol - oldCol) === 1 && Math.abs(newRow-oldRow) === 1 && boardState[oldRow][newCol] !== ' ' && boardState[newRow][newCol] === ' ' && ((boardState[oldRow][newCol].toUpperCase() == boardState[oldRow][newCol]) !== isWhite || boardState[oldRow][newCol].toLowerCase() === 'd' || boardState[oldRow][newCol].toLowerCase() === 'x')) {
+                return true;
+            }
+        }
+
         return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
     }
 
@@ -580,6 +648,12 @@ function checkValidMove(boardState, piece, oldSquare, newSquare) {
             return true;
         }
 
+        if (gambleBoard[oldRow][oldCol] === 'w') {
+            if (Math.abs(newCol - oldCol) === 1 && Math.abs(newRow-oldRow) === 1 && boardState[oldRow][newCol] !== ' ' && boardState[newRow][newCol] === ' ' && ((boardState[oldRow][newCol].toUpperCase() == boardState[oldRow][newCol]) !== isWhite || boardState[oldRow][newCol].toLowerCase() === 'd' || boardState[oldRow][newCol].toLowerCase() === 'x')) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -588,6 +662,13 @@ function checkValidMove(boardState, piece, oldSquare, newSquare) {
         if (Math.abs(newRow - oldRow) === Math.abs(newCol - oldCol)) {
             return isPathClear(boardState, oldRow, oldCol, newRow, newCol);
         }
+
+        if (gambleBoard[oldRow][oldCol] === 'w') {
+            if (Math.abs(newCol - oldCol) === 1 && Math.abs(newRow-oldRow) === 1 && boardState[oldRow][newCol] !== ' ' && boardState[newRow][newCol] === ' ' && ((boardState[oldRow][newCol].toUpperCase() == boardState[oldRow][newCol]) !== isWhite || boardState[oldRow][newCol].toLowerCase() === 'd' || boardState[oldRow][newCol].toLowerCase() === 'x')) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -596,6 +677,13 @@ function checkValidMove(boardState, piece, oldSquare, newSquare) {
         if (newRow === oldRow || newCol === oldCol || Math.abs(newRow - oldRow) === Math.abs(newCol - oldCol)) {
             return isPathClear(boardState, oldRow, oldCol, newRow, newCol);
         }
+
+        if (gambleBoard[oldRow][oldCol] === 'w') {
+            if (Math.abs(newCol - oldCol) === 1 && Math.abs(newRow-oldRow) === 1 && boardState[oldRow][newCol] !== ' ' && boardState[newRow][newCol] === ' ' && ((boardState[oldRow][newCol].toUpperCase() == boardState[oldRow][newCol]) !== isWhite || boardState[oldRow][newCol].toLowerCase() === 'd' || boardState[oldRow][newCol].toLowerCase() === 'x')) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -613,6 +701,13 @@ function checkValidMove(boardState, piece, oldSquare, newSquare) {
     if (pieceType === 'k') {
         const rowDiff = Math.abs(newRow - oldRow);
         const colDiff = Math.abs(newCol - oldCol);
+
+        if (gambleBoard[oldRow][oldCol] === 'w') {
+            if (Math.abs(newCol - oldCol) === 1 && Math.abs(newRow-oldRow) === 1 && boardState[oldRow][newCol] !== ' ' && boardState[newRow][newCol] === ' ' && ((boardState[oldRow][newCol].toUpperCase() == boardState[oldRow][newCol]) !== isWhite || boardState[oldRow][newCol].toLowerCase() === 'd' || boardState[oldRow][newCol].toLowerCase() === 'x')) {
+                return true;
+            }
+        }
+
         return (rowDiff <= 1 && colDiff <= 1);
     }
 
@@ -626,7 +721,7 @@ function select(square, row, col) {
     console.log(`Selected Piece: ${selectedPiece} | Selected Square: ${selectedSquare} | Selected Old Square: ${selectedOldSquare}`);
     if (selectedOldSquare !== null && selectedSquare == null) {
         console.log('Selecting square')
-        if (checkValidMove(initialBoard, selectedPiece, selectedOldSquare, square)) {
+        if (checkValidMove(gambleBoard, initialBoard, selectedPiece, selectedOldSquare, square)) {
             console.log('Valid move')
 
             selectedSquare = square;
@@ -698,16 +793,18 @@ function toggleRules() {
     rulesShown = !rulesShown
 }
 
-function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
-    const newBoard = structuredClone(boardToUpdate);
+function movePiece(real, gambleBoard, boardToUpdate, piece, oldSquare, newSquare) {
+    let newBoard = structuredClone(boardToUpdate);
+    let newGambleBoard = structuredClone(gambleBoard)
     
     const oldRow = oldSquare.dataset.row;
     const oldCol = oldSquare.dataset.col;
     const row = newSquare.dataset.row;
     const col = newSquare.dataset.col;
     
-    if ((piece.toLowerCase() === 'e' || piece.toLowerCase() === 'p') && col !== oldCol && boardToUpdate[row][col] === ' ') {
+    if ((piece.toLowerCase() === 'e' || piece.toLowerCase() === 'p' || gambleBoard[oldRow][oldCol] === 'w') && col !== oldCol && boardToUpdate[row][col] === ' ') {
         newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
+        newGambleBoard[oldRow] = newGambleBoard[oldRow].substring(0, oldCol) + ' ' + newGambleBoard[oldRow].substring(parseInt(oldCol) + 1);
         newBoard[oldRow] = newBoard[oldRow].substring(0, col) + ' ' + newBoard[oldRow].substring(parseInt(col) + 1); // Remove the captured pawn
     } else if (boardToUpdate[row][col].toLowerCase() === 'c' || boardToUpdate[row][col].toLowerCase() === 'h') {
         for (let r = 0; r < colLength; r++) {
@@ -718,14 +815,21 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
             }
         }
         newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
+        newGambleBoard[oldRow] = newGambleBoard[oldRow].substring(0, oldCol) + ' ' + newGambleBoard[oldRow].substring(parseInt(oldCol) + 1);
     } else if (piece.toLowerCase() !== 'd') {
         newBoard[oldRow] = newBoard[oldRow].substring(0, oldCol) + ' ' + newBoard[oldRow].substring(parseInt(oldCol) + 1);
+        newGambleBoard[oldRow] = newGambleBoard[oldRow].substring(0, oldCol) + ' ' + newGambleBoard[oldRow].substring(parseInt(oldCol) + 1);
     }
-
+    
     if (piece.toLowerCase() === 'a' && boardToUpdate[row][col] !== ' ') {
         newBoard[row] = newBoard[row].substring(0, col) + ((piece.toLowerCase() === piece) ? 'X' : 'x') + newBoard[row].substring(parseInt(col) + 1);
     } else {
         newBoard[row] = newBoard[row].substring(0, col) + piece + newBoard[row].substring(parseInt(col) + 1);
+        if (gambleBoard[oldRow][oldCol] === 'w') {
+            newGambleBoard[row] = newGambleBoard[row].substring(0, col) + 'w' + newGambleBoard[row].substring(parseInt(col) + 1);
+        } else {
+            newGambleBoard[row] = newGambleBoard[row].substring(0, col) + ' ' + newGambleBoard[row].substring(parseInt(col) + 1);
+        }
     }
     
     if (real && !mute) {
@@ -734,12 +838,12 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
         if (newBoard[0].toLowerCase().includes('p') || newBoard[(colLength-1)].toLowerCase().includes('p')) {
             // pass
         } else if (inCheck(newBoard)) {
-            if (inCheckmate(newBoard)) {
+            if (inCheckmate(newGambleBoard, newBoard)) {
                 sound = new Audio('assets/audio/checkmate.wav');
             } else {
                 sound = new Audio('assets/audio/check.wav');
             }
-        } else if (inCheckmate(newBoard)) {
+        } else if (inCheckmate(newGambleBoard, newBoard)) {
             sound = new Audio('assets/audio/stalemate.wav');
         } else if (piece.toLowerCase() === 'a' && boardToUpdate[row][col] !== ' ') {
             sound = new Audio('assets/audio/explode.wav');
@@ -760,7 +864,7 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
     if (real) { console.log(movesUntilArrival, movesUntilDeparture); }
     
     if (real) { joeBidenTurns--; }
-
+    
     if (real && piece.toLowerCase() !== 'j') {
         if (movesUntilArrival > 0) {
             movesUntilArrival--;
@@ -770,7 +874,7 @@ function movePiece(real, boardToUpdate, piece, oldSquare, newSquare) {
         }
     }
     
-    return newBoard;
+    return [newGambleBoard, newBoard];
 }
 
 function viewBoard() {
@@ -781,6 +885,152 @@ function viewBoard() {
     const viewButton = document.getElementById('viewButton');
     
     viewButton.classList.add('invisible');
+}
+
+function gamble() {
+    const startSound = new Audio('assets/audio/startGamble.wav');
+    startSound.volume = 0.32;
+    if (!mute) { startSound.play(); }
+    return new Promise((resolve) => {
+        const gambleWindow = document.createElement('div');
+        gambleWindow.classList.add('gambleWindow');
+        
+        const gambleGrid = document.createElement('div');
+        gambleGrid.classList.add('gambleGrid');
+
+        for (let i = 0; i < 3; i++) {
+            const slot = document.createElement('div');
+            slot.classList.add('slot');
+            slot.id = `slot${i}`;
+            
+            gambleGrid.append(slot);
+            
+        }
+        
+        const spinButton = document.createElement('button');
+        spinButton.classList.add('gambleButton');
+        spinButton.innerHTML = 'Spin';
+        
+        const symbols = [
+            'orange.png',
+            '7.png',
+            'lemon.png',
+            'cherry.png',
+        ]
+        
+        const spinSound = new Audio('assets/audio/spinGamble.wav');
+        const loseSound = new Audio('assets/audio/loseGamble.wav');
+        const winSound = new Audio('assets/audio/winGamble.wav');
+        
+        spinSound.volume = 0.32;
+        loseSound.volume = 0.32;
+        winSound.volume = 0.32;
+        
+        let spins = 3;
+        
+        spinButton.addEventListener('click', () => {
+            let symbolsChosen = [];
+            
+            function randomiseSlots(i, continueCode) {
+                setTimeout(() => {
+                    let imgs = document.getElementsByClassName('slotSymbol');
+                    Array.from(imgs).forEach(img => img.remove());
+                    symbolsChosen = [];
+                    for (let j = 0; j < 3; j++) {
+                        let slotDiv = document.getElementById(`slot${j}`);
+                        
+                        let symbolChosen = symbols[Math.floor(Math.random() * symbols.length)];
+                        
+                        symbolsChosen.push(symbolChosen);
+                        
+                        let img = document.createElement('img');
+                        img.classList.add('slotSymbol');
+                        img.src = `assets/gambling/${symbolChosen}`;
+                        
+                        slotDiv.appendChild(img);
+                    }
+                    console.log(spins);
+                    if (continueCode) {
+                        setTimeout(() => {
+                            console.log(symbolsChosen);
+                            if (!symbolsChosen.every(val => val === symbolsChosen[0])) {
+                                if (!mute) { loseSound.play(); }
+                                if (spins === 0) {
+                                    spinButton.remove();
+                                    setTimeout(() => {
+                                        gambleWindow.remove();
+                                        rowloop: for (let r = 0; r < colLength; r++) {
+                                            for (let c = 0; c < rowLength; c++) {
+                                                if (initialBoard[r][c] === ' ' && lastBoard[r][c] !== ' ') {
+                                                    gambleBoard[r] = gambleBoard[r].substring(0, c) + 'l' + gambleBoard[r].substring(parseInt(c) + 1);
+                                                    break rowloop;
+                                                }
+                                            }
+                                        }
+                                        initialBoard = lastBoard;
+                                        resolve();
+                                    }, 1200);
+                                }
+                            } else {
+                                spinButton.remove();
+                                if (!mute) { winSound.play(); }
+                                function changeColor(color, i) {
+                                    setTimeout(() => {
+                                        gambleWindow.style.backgroundColor = color;
+                                    }, 130 * i);
+                                }
+                                [
+                                    'red', 'orange', 'yellow', 'lime', 'aqua',
+                                    'fuchsia', 'magenta', 'purple', 'blue', 'cyan',
+                                    'green', 'yellowgreen', 'springgreen', 'crimson', 'hotpink',
+                                    'deeppink', 'orangered', 'gold', 'darkorange', 'tomato',
+                                    'salmon', 'coral', 'mediumvioletred', 'chocolate', 'sandybrown',
+                                    'orangered', 'firebrick', 'mediumseagreen', 'lightcoral', 'darkviolet',
+                                    'plum', 'violet', 'mediumorchid', 'darkmagenta', 'darkslateblue',
+                                    'rebeccapurple', 'slateblue', 'lightsalmon', 'darkturquoise', 'dodgerblue'
+                                ].forEach(color => {
+                                    changeColor(color, [
+                                        'red', 'orange', 'yellow', 'lime', 'aqua',
+                                        'fuchsia', 'magenta', 'purple', 'blue', 'cyan',
+                                        'green', 'yellowgreen', 'springgreen', 'crimson', 'hotpink',
+                                        'deeppink', 'orangered', 'gold', 'darkorange', 'tomato',
+                                        'salmon', 'coral', 'mediumvioletred', 'chocolate', 'sandybrown',
+                                        'orangered', 'firebrick', 'mediumseagreen', 'lightcoral', 'darkviolet',
+                                        'plum', 'violet', 'mediumorchid', 'darkmagenta', 'darkslateblue',
+                                        'rebeccapurple', 'slateblue', 'lightsalmon', 'darkturquoise', 'dodgerblue'
+                                    ].indexOf(color));
+                                })
+                                setTimeout(() => {
+                                    gambleWindow.remove();
+                                    rowloop: for (let r = 0; r < colLength; r++) {
+                                        for (let c = 0; c < rowLength; c++) {
+                                            if (initialBoard[r][c] === ' ' && lastBoard[r][c] !== ' ') {
+                                                gambleBoard[r] = gambleBoard[r].substring(0, c) + 'w' + gambleBoard[r].substring(parseInt(c) + 1);
+                                                break rowloop;
+                                            }
+                                        }
+                                    }
+                                    initialBoard = lastBoard;
+                                    resolve();
+                                }, 5200);
+                            }
+                        }, 112);
+                    }
+                }, 112 * i);
+            }
+
+            spinSound.play();
+            randomiseSlots(0, false);
+            randomiseSlots(1, false);
+            randomiseSlots(2, true);
+            spins--;
+            
+        });
+
+        gambleWindow.appendChild(gambleGrid);
+        gambleWindow.appendChild(spinButton);
+        document.body.appendChild(gambleWindow);
+    });
 }
 
 async function updateBoard() {
@@ -865,6 +1115,29 @@ async function updateBoard() {
         
         trainArrived = false;
     }
+    rowloop: for (let r = (colLength/2)-1; r <= (colLength/2); r++) {
+        for (let c = rowLength-2; c < rowLength; c++) {
+            let row;
+            let col;
+            if (flipped) { row = (colLength-r)-1; col = (rowLength-c)-1; }
+            else { row = r; col = c; }
+            if (initialBoard[row][col] !== ' ' && initialBoard[row][col].toLowerCase() !== 'a' && !casinoCaptured) {
+                await gamble();
+            } else if (initialBoard[row][col].toLowerCase() === 'a' && !casinoCaptured) {
+                casinoCaptured = true;
+                for (let xr = (colLength/2)-1; xr <= (colLength/2); xr++) {
+                    for (let xc = rowLength-2; xc < rowLength; xc++) {
+                        let xrow;
+                        let xcol;
+                        if (flipped) { xrow = (colLength-xr)-1; xcol = (rowLength-xc)-1; }
+                        else { xrow = xr; xcol = xc; }
+                        initialBoard[xrow] = initialBoard[xrow].substring(0, xcol) + 'x' + initialBoard[xrow].substring(parseInt(xcol) + 1);
+                    }
+                }
+                break rowloop;
+            }
+        }
+    }
     if (!initialBoard.join('').includes('j')) {
         blackJoeOldSquare = null;
         blackJoeSquare = null;
@@ -906,7 +1179,7 @@ async function updateBoard() {
                     for (let c = 0; c < colLength; c++) {
                         if (initialBoard[r][c] === 'j') {
                             blackJoeSquare = { dataset: { row: row, col: col } };
-                            initialBoard = movePiece(true, initialBoard, 'j', { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } });
+                            [gambleBoard, initialBoard] = movePiece(true, gambleBoard, initialBoard, 'j', { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } });
                         }
                     }
                 }
@@ -927,7 +1200,7 @@ async function updateBoard() {
                         if (initialBoard[r][c] === 'J') {
                             whiteJoeOldSquare = whiteJoeSquare;
                             whiteJoeSquare = { dataset: { row: row, col: col } };
-                            initialBoard = movePiece(true, initialBoard, 'J', { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } });
+                            [gambleBoard, initialBoard] = movePiece(true, gambleBoard, initialBoard, 'J', { dataset: { row: r, col: c } }, { dataset: { row: row, col: col } });
                         }
                     }
                 }
@@ -939,14 +1212,14 @@ async function updateBoard() {
     }
     const board = document.getElementById('chessboard').children;
     if (!checkmate && !stalemate && inCheck(initialBoard)) {
-        if (inCheckmate(initialBoard)) {
+        if (inCheckmate(gambleBoard, initialBoard)) {
             checkmate = true;
             document.body.classList.add('check');
         } else {
             check = true;
             document.body.classList.add('check');
         }
-    } else if (!checkmate && !stalemate && inCheckmate(initialBoard)) {
+    } else if (!checkmate && !stalemate && inCheckmate(gambleBoard, initialBoard)) {
         stalemate = true;
         document.body.classList.add('check');
     } else {
@@ -966,8 +1239,34 @@ async function updateBoard() {
             if ((square.dataset.row == (colLength/2+1)) && (square.dataset.col == (rowLength/2)-1)) { img.src = `assets/${theme}/wlt.png`; }
             if ((square.dataset.row == (colLength/2+1)) && (square.dataset.col == (rowLength/2))) { img.src = `assets/${theme}/wrt.png`; }
             img.className = 'piece';
-            square.appendChild(img);
+            if (img.src !== '') {
+                square.appendChild(img);
+            }
             console.log('drawing train');
+        }
+        if (!casinoCaptured) {
+            const img = document.createElement('img');
+            img.className = 'piece';
+            if (!flipped && parseInt(row) === (colLength / 2) - 1 && parseInt(col) === rowLength - 2) {
+                img.src = 'assets/gambling/tli.png';
+            } else if (!flipped && parseInt(row) === (colLength / 2) && parseInt(col) === rowLength - 2) {
+                img.src = 'assets/gambling/bli.png';
+            } else if (!flipped && parseInt(row) === (colLength / 2) - 1 && parseInt(col) === rowLength - 1) {
+                img.src = 'assets/gambling/tri.png';
+            } else if (!flipped && parseInt(row) === (colLength / 2) && parseInt(col) === rowLength - 1) {
+                img.src = 'assets/gambling/bri.png';
+            } else if (flipped && parseInt(row) === (colLength / 2) - 1 && parseInt(col) === 0) {
+                img.src = 'assets/gambling/tli.png';
+            } else if (flipped && parseInt(row) === (colLength / 2) && parseInt(col) === 0) {
+                img.src = 'assets/gambling/bli.png';
+            } else if (flipped && parseInt(row) === (colLength / 2) - 1 && parseInt(col) === 1) {
+                img.src = 'assets/gambling/tri.png';
+            } else if (flipped && parseInt(row) === (colLength / 2) && parseInt(col) === 1) {
+                img.src = 'assets/gambling/bri.png';
+            }            
+            if (img.src !== '') {
+                square.appendChild(img);
+            }
         }
         if (piece !== ' ') {
             const img = document.createElement('img');
@@ -1024,7 +1323,7 @@ async function updateBoard() {
             square.classList.remove('blue');
         }
         if (selectedPiece !== null && selectedOldSquare !== null) {
-            if (checkValidMove(initialBoard, selectedPiece, selectedOldSquare, square)) {
+            if (checkValidMove(gambleBoard, initialBoard, selectedPiece, selectedOldSquare, square)) {
                 const dot = document.createElement('div');
                 dot.classList.add('dot');
                 square.appendChild(dot);
