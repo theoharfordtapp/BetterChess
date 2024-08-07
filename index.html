@@ -88,13 +88,13 @@
         .promotionButton:hover {
             background-color: #00000020;
         }
-        p {
+        p.button {
             font-size: 3.2vw;
             margin: 1rem 0;
         }
         @media screen and (min-width: 720px) {
-            p {
-                font-size: 18px;
+            p.rulesText {
+                font-size: 2vmin;
             }
             .control {
                 width: 90px;
@@ -112,10 +112,18 @@
                 height: 112px;
             }
         }
+        @media screen and (max-width: 720px) {
+            .rules {
+                transform: translateY(6%);
+            }
+        }
         @media screen and (max-width: 480px) {
             .control {
                 margin: 2vmin 1.4vmin;
                 padding: 0.6vh 1.2vh;
+            }
+            .rules {
+                transform: translateY(12%);
             }
         }
         @media screen and (max-width: 350px) {
@@ -234,11 +242,13 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            /* transform: translateY(-12%); */
             padding: 2%;
-            max-width: 64%;
+            max-width: 72%;
             font-size: 1rem;
-            overflow: scroll;
+            /* max-height: 94%; */
+            /* height: 94%; */
+            /* overflow: auto; */
+            /* box-sizing: border-box;x */
         }
         .gambleWindow {
             display: flex;
@@ -273,7 +283,7 @@
             border-radius: 40%;
             transition: 0.6s;
             cursor: pointer;
-            position: absolute;
+            position: fixed;
             top: 0;
             right: 0;
             z-index: 3;
@@ -300,7 +310,7 @@
     <div class="blur" id="blurScreen"></div>
     <div class="rules invisible" id="rulesWindow">
         <button class="close" onclick="toggleRules();">×</button>
-        <p>
+        <p class="rulesText">
             Knook: Can move like a knight and rook combined.
             <br>
             <br>
